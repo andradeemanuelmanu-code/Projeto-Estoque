@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -47,9 +48,11 @@ export const SupplierCard = ({ supplier, onEdit, onDelete }: SupplierCardProps) 
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full">
-          <MapPin className="mr-2 h-4 w-4" /> Ver no Mapa
-        </Button>
+        <Link to={`/mapa?selectedId=${supplier.id}`} className="w-full">
+          <Button variant="outline" className="w-full">
+            <MapPin className="mr-2 h-4 w-4" /> Ver no Mapa
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

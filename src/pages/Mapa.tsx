@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { mockCustomers } from "@/data/customers";
 import { mockSuppliers } from "@/data/suppliers";
 import { MapComponent } from "@/components/mapa/MapComponent";
@@ -9,6 +10,7 @@ const Mapa = () => {
   const [showSuppliers, setShowSuppliers] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
+  const [searchParams] = useSearchParams();
 
   const locations = useMemo(() => {
     const customers = showCustomers ? mockCustomers.map(c => ({ ...c, type: 'customer' })) : [];
@@ -20,6 +22,16 @@ const Mapa = () => {
       location.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [showCustomers, showSuppliers, searchTerm]);
+
+  useEffect(() => {
+    const selectedId = searchParams.get('selectedId');
+    if (selectedId && locations.length > 0) {
+      const locationToSelect = locations.find(loc => loc.id === selectedId);
+      if (locationToSelect) {
+        setSelectedLocation(locationToSelect);
+      }
+    }
+  }, [searchParams, locations]);
 
   const handleLocationSelect = (location: any) => {
     setSelectedLocation(location);
