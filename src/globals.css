@@ -84,3 +84,15 @@
     font-family: 'Inter', sans-serif;
   }
 }
+
+@layer utilities {
+  @keyframes bell-shake {
+    0%, 100% { transform: rotate(0); }
+    10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
+    20%, 40%, 60%, 80% { transform: rotate(10deg); }
+  }
+
+  .animate-bell-shake {
+    animation: bell-shake 0.8s cubic-bezier(.36,.07,.19,.97) both;
+  }
+}

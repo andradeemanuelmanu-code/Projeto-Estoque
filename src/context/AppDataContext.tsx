@@ -5,14 +5,24 @@ import { mockCustomers, Customer } from '@/data/customers';
 import { mockSuppliers, Supplier } from '@/data/suppliers';
 import { mockPurchaseOrders, PurchaseOrder } from '@/data/purchaseOrders';
 
+export type Notification = {
+  id: string;
+  message: string;
+  read: boolean;
+  createdAt: Date;
+  linkTo?: string;
+};
+
 interface AppDataContextType {
   products: Product[];
   salesOrders: SalesOrder[];
   customers: Customer[];
   suppliers: Supplier[];
   purchaseOrders: PurchaseOrder[];
+  notifications: Notification[];
   addSalesOrder: (order: Omit<SalesOrder, 'id' | 'number'>) => void;
   addPurchaseOrder: (order: Omit<PurchaseOrder, 'id' | 'number'>) => void;
+  markNotificationsAsRead: () => void;
 }
 
 const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
@@ -23,6 +33,22 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
   const [customers] = useState<Customer[]>(mockCustomers);
   const [suppliers] = useState<Supplier[]>(mockSuppliers);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(mockPurchaseOrders);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const addNotification = (message: string, linkTo?: string) => {
+    const newNotification: Notification = {
+      id: `notif_${Date.now()}`,
+      message,
+      read: false,
+      createdAt: new Date(),
+      linkTo,
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  const markNotificationsAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
 
   const addSalesOrder = (orderData: Omit<SalesOrder, 'id' | 'number'>) => {
     const newOrderNumber = `PV-2024-${(salesOrders.length + 1).toString().padStart(3, '0')}`;
@@ -34,7 +60,14 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
       newOrder.items.forEach(item => {
         const productIndex = updatedProducts.findIndex(p => p.id === item.productId);
         if (productIndex !== -1) {
-          updatedProducts[productIndex].stock -= item.quantity;
+          const product = updatedProducts[productIndex];
+          const oldStock = product.stock;
+          const newStock = oldStock - item.quantity;
+          updatedProducts[productIndex].stock = newStock;
+
+          if (newStock <= product.minStock && oldStock > product.minStock) {
+            addNotification(`Estoque baixo: ${product.description}`, '/estoque');
+          }
         }
       });
       return updatedProducts;
@@ -46,8 +79,6 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
     const newOrder: PurchaseOrder = { id: `po_${Date.now()}`, number: newOrderNumber, ...orderData };
     setPurchaseOrders(prevOrders => [newOrder, ...prevOrders]);
 
-    // For purchase orders, we assume "Recebido" status updates stock immediately for simplicity.
-    // A real-world app might have a separate receiving step.
     if (newOrder.status === 'Recebido') {
         setProducts(prevProducts => {
             const updatedProducts = [...prevProducts];
@@ -68,9 +99,11 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
     customers,
     suppliers,
     purchaseOrders,
+    notifications,
     addSalesOrder,
     addPurchaseOrder,
-  }), [products, salesOrders, customers, suppliers, purchaseOrders]);
+    markNotificationsAsRead,
+  }), [products, salesOrders, customers, suppliers, purchaseOrders, notifications]);
 
   return (
     <AppDataContext.Provider value={value}>

@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAppData } from "@/context/AppDataContext";
+import { cn } from "@/lib/utils";
 
 const navItems = [
     { to: "/", label: "Dashboard" },
@@ -21,6 +23,9 @@ const navItems = [
 ];
 
 export const Header = () => {
+  const { notifications, markNotificationsAsRead } = useAppData();
+  const hasUnreadNotifications = notifications.some(n => !n.read);
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -47,19 +52,33 @@ export const Header = () => {
 
       <div className="w-full flex-1" />
 
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={(open) => { if (open && hasUnreadNotifications) markNotificationsAsRead(); }}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon" className="h-8 w-8">
-            <Bell className="h-4 w-4" />
+          <Button variant="outline" size="icon" className="h-8 w-8 relative">
+            <Bell className={cn("h-4 w-4", hasUnreadNotifications && "text-red-500 animate-bell-shake")} />
+            {hasUnreadNotifications && (
+              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-card" />
+            )}
             <span className="sr-only">Toggle notifications</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-[350px]">
           <DropdownMenuLabel>Notificações</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Estoque baixo: Vela de Ignição</DropdownMenuItem>
-          <DropdownMenuItem>Novo pedido de venda recebido</DropdownMenuItem>
-          <DropdownMenuItem>Pedido de compra #PC-2024-002 recebido</DropdownMenuItem>
+          {notifications.length > 0 ? (
+            notifications.slice(0, 5).map(notification => (
+              <DropdownMenuItem key={notification.id} asChild className="cursor-pointer">
+                <Link to={notification.linkTo || '#'} className="flex flex-col items-start p-2">
+                  <p className={cn("text-sm whitespace-normal", !notification.read && "font-semibold")}>{notification.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {new Date(notification.createdAt).toLocaleString('pt-BR')}
+                  </p>
+                </Link>
+              </DropdownMenuItem>
+            ))
+          ) : (
+            <div className="p-4 text-center text-sm text-muted-foreground">Nenhuma notificação</div>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
