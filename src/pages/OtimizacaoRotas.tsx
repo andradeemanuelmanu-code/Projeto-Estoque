@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import axios from "axios";
 import { useAppData } from "@/context/AppDataContext";
 import { CustomerSelectionSidebar } from "@/components/otimizacao/CustomerSelectionSidebar";
 import { RouteMap } from "@/components/otimizacao/RouteMap";
@@ -25,12 +26,47 @@ const OtimizacaoRotas = () => {
     });
   };
 
+  const getOptimizedRoute = async (start: Coordinates, points: Coordinates[]) => {
+    const apiKey = import.meta.env.VITE_ORS_API_KEY;
+    if (!apiKey || apiKey.includes("COLE_SUA_CHAVE")) {
+      showError("Chave da API do OpenRouteService não configurada.");
+      throw new Error("API key is missing.");
+    }
+
+    const coordinates = [
+      [start.lng, start.lat],
+      ...points.map(p => [p.lng, p.lat])
+    ];
+
+    try {
+      const response = await axios.post(
+        'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
+        { coordinates },
+        {
+          headers: {
+            'Authorization': apiKey,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      // A API retorna [longitude, latitude], então precisamos inverter para o Leaflet que espera [latitude, longitude]
+      const routeCoordinates = response.data.features[0].geometry.coordinates.map((coord: number[]) => [coord[1], coord[0]]);
+      return routeCoordinates;
+
+    } catch (error) {
+      console.error("Erro ao buscar rota do OpenRouteService:", error);
+      showError("Falha ao calcular a rota. Verifique a chave da API e a conexão.");
+      throw error;
+    }
+  };
+
   const handleGenerateRoute = () => {
     setIsGenerating(true);
     const toastId = showLoading("Obtendo sua localização...");
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         dismissToast(toastId);
         const userCoords = {
           lat: position.coords.latitude,
@@ -40,20 +76,21 @@ const OtimizacaoRotas = () => {
         
         const processingToastId = showLoading("Calculando a rota otimizada...");
         
-        // Simula o cálculo da rota
-        setTimeout(() => {
+        try {
           const selectedCustomers = customers.filter(c => selectedCustomerIds.has(c.id));
           const customerCoords = selectedCustomers.map(c => ({ lat: c.lat, lng: c.lng }));
           
-          // A lógica de otimização real (ex: API do Google Maps) iria aqui.
-          // Para demonstração, apenas conectamos os pontos.
-          const calculatedRoute = [userCoords, ...customerCoords, userCoords];
+          const calculatedRoute = await getOptimizedRoute(userCoords, customerCoords);
           
-          setRoute(calculatedRoute);
+          // Adiciona o ponto inicial e final para fechar o ciclo
+          setRoute([userCoords, ...calculatedRoute, userCoords]);
           dismissToast(processingToastId);
           showSuccess("Rota gerada com sucesso!");
+        } catch (error) {
+          dismissToast(processingToastId);
+        } finally {
           setIsGenerating(false);
-        }, 1500);
+        }
       },
       (error) => {
         dismissToast(toastId);
