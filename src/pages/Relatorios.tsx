@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { File } from "lucide-react";
 import { ReportCard } from "@/components/relatorios/ReportCard";
-import { SalesByCategoryChart } from "@/components/relatorios/SalesByCategoryChart";
+import { ProductParetoChart } from "@/components/relatorios/ProductParetoChart";
 import { InventoryValueCard } from "@/components/relatorios/InventoryValueCard";
 import { TopCustomersChart } from "@/components/relatorios/TopCustomersChart";
 import { PurchasesBySupplierChart } from "@/components/relatorios/PurchasesBySupplierChart";
@@ -33,10 +33,10 @@ const Relatorios = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mt-4">
         <InventoryValueCard />
         <ReportCard
-          title="Vendas por Categoria"
-          description="Total de vendas faturadas por categoria de produto."
+          title="Análise de Pareto de Produtos"
+          description="Produtos que representam a maior parte do faturamento (Curva ABC)."
         >
-          <SalesByCategoryChart />
+          <ProductParetoChart />
         </ReportCard>
         <ReportCard
           title="Top 5 Clientes por Faturamento"
