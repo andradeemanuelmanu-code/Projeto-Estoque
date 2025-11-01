@@ -2,7 +2,7 @@ import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Ca
 import { useMemo } from 'react';
 import { useAppData } from '@/context/AppDataContext';
 
-export const StockMovementChart = () => {
+export const StockMovementChart = ({ pdfMode = false }: { pdfMode?: boolean }) => {
   const { salesOrders, purchaseOrders } = useAppData();
   const chartData = useMemo(() => {
     const movements: { [date: string]: { entradas: number; saidas: number } } = {};
@@ -34,8 +34,8 @@ export const StockMovementChart = () => {
         <YAxis stroke="#888888" fontSize={12} />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="Entradas" stroke="#22c55e" />
-        <Line type="monotone" dataKey="Saídas" stroke="#ef4444" />
+        <Line isAnimationActive={!pdfMode} type="monotone" dataKey="Entradas" stroke="#22c55e" />
+        <Line isAnimationActive={!pdfMode} type="monotone" dataKey="Saídas" stroke="#ef4444" />
       </LineChart>
     </ResponsiveContainer>
   );

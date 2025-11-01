@@ -8,7 +8,7 @@ const COLORS = {
   Cancelado: '#ef4444', // red
 };
 
-export const OrderStatusChart = () => {
+export const OrderStatusChart = ({ pdfMode = false }: { pdfMode?: boolean }) => {
   const { salesOrders } = useAppData();
   const chartData = useMemo(() => {
     const statusCounts = salesOrders.reduce((acc, order) => {
@@ -30,6 +30,7 @@ export const OrderStatusChart = () => {
         />
         <Legend />
         <Pie
+          isAnimationActive={!pdfMode}
           data={chartData}
           cx="50%"
           cy="50%"

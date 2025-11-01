@@ -2,7 +2,7 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Toolti
 import { useMemo } from 'react';
 import { useAppData } from '@/context/AppDataContext';
 
-export const TopCustomersChart = () => {
+export const TopCustomersChart = ({ pdfMode = false }: { pdfMode?: boolean }) => {
   const { salesOrders } = useAppData();
   const chartData = useMemo(() => {
     const salesByCustomer: { [key: string]: number } = {};
@@ -34,7 +34,7 @@ export const TopCustomersChart = () => {
           <YAxis type="category" dataKey="name" width={120} />
           <Tooltip formatter={(value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} />
           <Legend />
-          <Bar dataKey="Faturamento" fill="#8884d8" />
+          <Bar isAnimationActive={!pdfMode} dataKey="Faturamento" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
     </div>

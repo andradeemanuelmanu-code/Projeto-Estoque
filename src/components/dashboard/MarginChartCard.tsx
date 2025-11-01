@@ -7,7 +7,7 @@ const data = [
   { average: 62 }, { average: 69 }, { average: 91 }, { average: 148 },
 ];
 
-export const MarginChartCard = ({ linkTo }: { linkTo?: string }) => {
+export const MarginChartCard = ({ linkTo, pdfMode = false }: { linkTo?: string, pdfMode?: boolean }) => {
   return (
     <DashboardCard title="Margem de Lucro Média" Icon={TrendingUp} linkTo={linkTo}>
       <div className="flex items-start justify-between gap-4">
@@ -23,7 +23,7 @@ export const MarginChartCard = ({ linkTo }: { linkTo?: string }) => {
                 labelStyle={{ display: "none" }}
                 position={{ x: 10, y: 60 }}
               />
-              <Line type="monotone" dataKey="average" stroke="#8884d8" strokeWidth={2} dot={false} />
+              <Line isAnimationActive={!pdfMode} type="monotone" dataKey="average" stroke="#8884d8" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

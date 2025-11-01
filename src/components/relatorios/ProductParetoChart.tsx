@@ -2,7 +2,7 @@ import { ComposedChart, Bar, Line, ResponsiveContainer, XAxis, YAxis, CartesianG
 import { useMemo } from 'react';
 import { useAppData } from '@/context/AppDataContext';
 
-export const ProductParetoChart = () => {
+export const ProductParetoChart = ({ pdfMode = false }: { pdfMode?: boolean }) => {
   const { salesOrders, products } = useAppData();
   const chartData = useMemo(() => {
     const productSales: { [key: string]: number } = {};
@@ -81,8 +81,8 @@ export const ProductParetoChart = () => {
             }}
           />
           <Legend verticalAlign="top" />
-          <Bar dataKey="Vendas" yAxisId="left" fill="#8884d8" name="Vendas (R$)" />
-          <Line type="monotone" dataKey="Cumulativo" yAxisId="right" stroke="#82ca9d" name="Acumulado (%)" dot={false} />
+          <Bar isAnimationActive={!pdfMode} dataKey="Vendas" yAxisId="left" fill="#8884d8" name="Vendas (R$)" />
+          <Line isAnimationActive={!pdfMode} type="monotone" dataKey="Cumulativo" yAxisId="right" stroke="#82ca9d" name="Acumulado (%)" dot={false} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>

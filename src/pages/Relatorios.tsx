@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { File } from "lucide-react";
+import { File, Loader2 } from "lucide-react";
 import { ReportCard } from "@/components/relatorios/ReportCard";
 import { ProductParetoChart } from "@/components/relatorios/ProductParetoChart";
 import { InventoryValueCard } from "@/components/relatorios/InventoryValueCard";
@@ -20,35 +20,39 @@ const Relatorios = () => {
   };
 
   useEffect(() => {
-    if (isGeneratingPdf && pdfRef.current) {
-      const toastId = showLoading("Gerando PDF do relatório...");
-      const element = pdfRef.current;
+    if (!isGeneratingPdf || !pdfRef.current) return;
 
-      html2canvas(element, { scale: 2 }) // Aumenta a escala para melhor qualidade
+    const toastId = showLoading("Gerando PDF do relatório...");
+    const element = pdfRef.current;
+
+    // Adiciona um pequeno atraso para garantir que tudo esteja renderizado
+    setTimeout(() => {
+      html2canvas(element, {
+        scale: 2, // Melhora a resolução
+        useCORS: true,
+        backgroundColor: '#ffffff', // Define um fundo branco
+      })
         .then((canvas) => {
           const imgData = canvas.toDataURL('image/png');
           const pdf = new jsPDF('p', 'mm', 'a4');
+          
+          const imgProps = pdf.getImageProperties(imgData);
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = pdf.internal.pageSize.getHeight();
-          const canvasWidth = canvas.width;
-          const canvasHeight = canvas.height;
-          const ratio = canvasWidth / canvasHeight;
-          const width = pdfWidth;
-          const height = width / ratio;
-
-          // Se o conteúdo for maior que uma página, divida-o
+          const imgWidth = pdfWidth;
+          const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+          
+          let heightLeft = imgHeight;
           let position = 0;
-          const pageHeight = pdf.internal.pageSize.height;
-          let heightLeft = canvasHeight * pdfWidth / canvasWidth;
 
-          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, height);
-          heightLeft -= pageHeight;
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pdfHeight;
 
-          while (heightLeft >= 0) {
-            position = heightLeft - (canvasHeight * pdfWidth / canvasWidth);
+          while (heightLeft > 0) {
+            position -= pdfHeight;
             pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, height);
-            heightLeft -= pageHeight;
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pdfHeight;
           }
           
           pdf.save(`relatorio-geral-${new Date().toISOString().split('T')[0]}.pdf`);
@@ -63,7 +67,7 @@ const Relatorios = () => {
         .finally(() => {
           setIsGeneratingPdf(false);
         });
-    }
+    }, 500); // Atraso de 500ms
   }, [isGeneratingPdf]);
 
   return (
@@ -77,7 +81,7 @@ const Relatorios = () => {
           </Button>
           <Button onClick={handleExportPDF} disabled={isGeneratingPdf}>
             {isGeneratingPdf ? (
-              <File className="h-4 w-4 mr-2 animate-pulse" />
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
               <File className="h-4 w-4 mr-2" />
             )}
