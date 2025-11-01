@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Route, Loader2 } from "lucide-react";
+import { Route, Loader2, Milestone, Clock, DollarSign } from "lucide-react";
 import { Customer } from "@/data/customers";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface CustomerSelectionSidebarProps {
   customers: Customer[];
@@ -13,7 +14,22 @@ interface CustomerSelectionSidebarProps {
   onCustomerToggle: (customerId: string) => void;
   onGenerateRoute: () => void;
   isGenerating: boolean;
+  routeSummary: { distance: number; duration: number } | null;
 }
+
+const formatDistance = (meters: number) => {
+  const km = meters / 1000;
+  return `${km.toFixed(1)} km`;
+};
+
+const formatDuration = (seconds: number) => {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) {
+    return `${h}h ${m}min`;
+  }
+  return `${m}min`;
+};
 
 export const CustomerSelectionSidebar = ({
   customers,
@@ -21,6 +37,7 @@ export const CustomerSelectionSidebar = ({
   onCustomerToggle,
   onGenerateRoute,
   isGenerating,
+  routeSummary,
 }: CustomerSelectionSidebarProps) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -66,6 +83,40 @@ export const CustomerSelectionSidebar = ({
           </div>
         ))}
       </ScrollArea>
+
+      {routeSummary && (
+        <div className="p-4 border-t">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Resumo da Rota</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-2">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Milestone className="h-4 w-4" />
+                  <span>Distância Total</span>
+                </div>
+                <span className="font-semibold">{formatDistance(routeSummary.distance)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>Tempo Estimado</span>
+                </div>
+                <span className="font-semibold">{formatDuration(routeSummary.duration)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <DollarSign className="h-4 w-4" />
+                  <span>Custo de Pedágio</span>
+                </div>
+                <span className="font-semibold text-muted-foreground">N/A</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <div className="p-4 border-t">
         <Button
           onClick={onGenerateRoute}

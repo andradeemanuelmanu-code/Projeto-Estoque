@@ -8,6 +8,10 @@ import { Customer } from "@/data/customers";
 
 type Coordinates = { lat: number; lng: number };
 type OrderedCustomer = Customer & { sequence: number };
+type RouteSummary = {
+  distance: number; // em metros
+  duration: number; // em segundos
+};
 
 const OtimizacaoRotas = () => {
   const { customers } = useAppData();
@@ -17,6 +21,7 @@ const OtimizacaoRotas = () => {
   const [returnRoute, setReturnRoute] = useState<Coordinates[] | null>(null);
   const [orderedCustomers, setOrderedCustomers] = useState<OrderedCustomer[] | null>(null);
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
+  const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
 
   const handleCustomerToggle = (customerId: string) => {
     setSelectedCustomerIds(prev => {
@@ -25,6 +30,11 @@ const OtimizacaoRotas = () => {
       else newSet.add(customerId);
       return newSet;
     });
+    // Limpa os dados da rota anterior se a seleção mudar
+    setOutboundRoute(null);
+    setReturnRoute(null);
+    setOrderedCustomers(null);
+    setRouteSummary(null);
   };
 
   const handleGenerateRoute = () => {
@@ -34,6 +44,10 @@ const OtimizacaoRotas = () => {
     }
 
     setIsGenerating(true);
+    setOutboundRoute(null);
+    setReturnRoute(null);
+    setOrderedCustomers(null);
+    setRouteSummary(null);
     const toastId = showLoading("Obtendo sua localização...");
 
     navigator.geolocation.getCurrentPosition(
@@ -60,7 +74,7 @@ const OtimizacaoRotas = () => {
           const coordinates = [
             [userCoords.lng, userCoords.lat],
             ...selected.map(c => [c.lng, c.lat]),
-            [userCoords.lng, userCoords.lat] // Adiciona o ponto final de volta à origem
+            [userCoords.lng, userCoords.lat]
           ];
 
           const headers = {
@@ -77,9 +91,14 @@ const OtimizacaoRotas = () => {
           const feature = directionsResponse.data.features[0];
           const allCoordinates = feature.geometry.coordinates.map((c: number[]) => ({ lat: c[1], lng: c[0] }));
           
-          // Para simplificar, vamos tratar tudo como uma única rota de ida
+          const summary = feature.properties.summary;
+          setRouteSummary({
+            distance: summary.distance,
+            duration: summary.duration,
+          });
+          
           setOutboundRoute(allCoordinates);
-          setReturnRoute(null); // Limpamos a rota de volta por enquanto
+          setReturnRoute(null);
           
           dismissToast(processingToastId);
           showSuccess("Rota gerada com sucesso!");
@@ -117,6 +136,7 @@ const OtimizacaoRotas = () => {
         onCustomerToggle={handleCustomerToggle}
         onGenerateRoute={handleGenerateRoute}
         isGenerating={isGenerating}
+        routeSummary={routeSummary}
       />
       <div className="w-full h-full">
         <RouteMap
