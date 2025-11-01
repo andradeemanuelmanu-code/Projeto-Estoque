@@ -77,7 +77,7 @@ const IAInsights = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
-          <h1 className="text-lg font-semibold md:text-2xl text-foreground">IA Insights</h1>
+          <h1 className="text-lg font-semibold text-foreground">IA Insights</h1>
         </div>
       </div>
       <div className="grid gap-6 mt-4">
