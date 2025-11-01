@@ -12,6 +12,8 @@ const formSchema = z.object({
   email: z.string().email("Email inválido."),
   phone: z.string().min(1, "Telefone é obrigatório."),
   address: z.string().min(1, "Endereço é obrigatório."),
+  lat: z.coerce.number(),
+  lng: z.coerce.number(),
 });
 
 interface CustomerFormProps {
@@ -29,6 +31,8 @@ export const CustomerForm = ({ customer, onSubmit, onCancel }: CustomerFormProps
       email: customer?.email || "",
       phone: customer?.phone || "",
       address: customer?.address || "",
+      lat: customer?.lat || 0,
+      lng: customer?.lng || 0,
     },
   });
 
@@ -50,6 +54,14 @@ export const CustomerForm = ({ customer, onSubmit, onCancel }: CustomerFormProps
         <FormField control={form.control} name="address" render={({ field }) => (
           <FormItem><FormLabel>Endereço</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
         )} />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField control={form.control} name="lat" render={({ field }) => (
+            <FormItem><FormLabel>Latitude</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+          <FormField control={form.control} name="lng" render={({ field }) => (
+            <FormItem><FormLabel>Longitude</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+        </div>
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
           <Button type="submit">Salvar</Button>

@@ -14,6 +14,8 @@ const formSchema = z.object({
   phone: z.string().min(1, "Telefone é obrigatório."),
   address: z.string().min(1, "Endereço é obrigatório."),
   status: z.enum(["Ativo", "Inativo"]),
+  lat: z.coerce.number(),
+  lng: z.coerce.number(),
 });
 
 interface SupplierFormProps {
@@ -32,6 +34,8 @@ export const SupplierForm = ({ supplier, onSubmit, onCancel }: SupplierFormProps
       phone: supplier?.phone || "",
       address: supplier?.address || "",
       status: supplier?.status || "Ativo",
+      lat: supplier?.lat || 0,
+      lng: supplier?.lng || 0,
     },
   });
 
@@ -53,6 +57,14 @@ export const SupplierForm = ({ supplier, onSubmit, onCancel }: SupplierFormProps
         <FormField control={form.control} name="address" render={({ field }) => (
           <FormItem><FormLabel>Endereço</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
         )} />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField control={form.control} name="lat" render={({ field }) => (
+            <FormItem><FormLabel>Latitude</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+          <FormField control={form.control} name="lng" render={({ field }) => (
+            <FormItem><FormLabel>Longitude</FormLabel><FormControl><Input type="number" step="any" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+        </div>
         <FormField control={form.control} name="status" render={({ field }) => (
           <FormItem><FormLabel>Status</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
