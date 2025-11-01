@@ -21,6 +21,7 @@ import HistoricoCliente from "./pages/HistoricoCliente";
 import { AppDataProvider } from "./context/AppDataContext";
 import DetalhesPedidoVenda from "./pages/DetalhesPedidoVenda";
 import DetalhesPedidoCompra from "./pages/DetalhesPedidoCompra";
+import HistoricoProduto from "./pages/HistoricoProduto";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
               <Route path="/estoque" element={<Estoque />} />
+              <Route path="/estoque/:productId" element={<HistoricoProduto />} />
               <Route path="/compras/fornecedores" element={<Fornecedores />} />
               <Route path="/compras/pedidos" element={<PedidosCompra />} />
               <Route path="/compras/pedidos/novo" element={<NovoPedidoCompra />} />

@@ -21,9 +21,10 @@ interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
   onDelete: (productId: string) => void;
+  onViewHistory: (productId: string) => void;
 }
 
-export const ProductTable = ({ products, onEdit, onDelete }: ProductTableProps) => {
+export const ProductTable = ({ products, onEdit, onDelete, onViewHistory }: ProductTableProps) => {
   return (
     <div className="rounded-lg border shadow-sm bg-card">
       <Table>
@@ -67,7 +68,7 @@ export const ProductTable = ({ products, onEdit, onDelete }: ProductTableProps) 
                     <DropdownMenuItem onClick={() => onEdit(product)}>
                       <Pencil className="mr-2 h-4 w-4" /> Editar
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => { /* Lógica do histórico */ }}>
+                    <DropdownMenuItem onClick={() => onViewHistory(product.id)}>
                       <History className="mr-2 h-4 w-4" /> Histórico
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-red-500" onClick={() => onDelete(product.id)}>

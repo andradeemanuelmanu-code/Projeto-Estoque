@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
@@ -15,13 +16,12 @@ import { showSuccess, showError } from "@/utils/toast";
 import { useAppData } from "@/context/AppDataContext";
 
 const Estoque = () => {
-  // NOTE: Product state is now managed globally, but edits/deletes here are local for now.
-  // A full implementation would require update/delete functions in the context.
   const { products: globalProducts } = useAppData();
   const [products, setProducts] = useState<Product[]>(globalProducts);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const filteredProducts = useMemo(() => {
     const sourceProducts = products.map(p => {
@@ -72,6 +72,10 @@ const Estoque = () => {
     }
   };
 
+  const handleViewHistory = (productId: string) => {
+    navigate(`/estoque/${productId}`);
+  };
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -94,7 +98,12 @@ const Estoque = () => {
         </div>
       </div>
 
-      <ProductTable products={filteredProducts} onEdit={(p) => handleOpenModal(p)} onDelete={handleDeleteProduct} />
+      <ProductTable 
+        products={filteredProducts} 
+        onEdit={(p) => handleOpenModal(p)} 
+        onDelete={handleDeleteProduct}
+        onViewHistory={handleViewHistory}
+      />
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[625px]">
