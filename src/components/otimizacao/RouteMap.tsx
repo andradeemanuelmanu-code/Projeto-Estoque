@@ -1,6 +1,6 @@
 import "leaflet/dist/leaflet.css";
 import L from 'leaflet';
-import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, useMap, Tooltip } from 'react-leaflet';
 import { useEffect } from "react";
 
 // Ícones para o mapa
@@ -55,7 +55,13 @@ export const RouteMap = ({ orderedCustomers, outboundRoute, returnRoute, userLoc
           key={customer.id}
           position={[customer.lat, customer.lng]}
           icon={createNumberedIcon(customer.sequence)}
-        />
+        >
+          <Tooltip>
+            <strong>{customer.name}</strong>
+            <br />
+            {customer.address}
+          </Tooltip>
+        </Marker>
       ))}
       {userLocation && (
         <Marker
