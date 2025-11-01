@@ -22,6 +22,7 @@ interface AppDataContextType {
   notifications: Notification[];
   addSalesOrder: (order: Omit<SalesOrder, 'id' | 'number'>) => void;
   addPurchaseOrder: (order: Omit<PurchaseOrder, 'id' | 'number'>) => void;
+  cancelSalesOrder: (orderId: string) => void;
   markNotificationsAsRead: () => void;
 }
 
@@ -93,6 +94,35 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const cancelSalesOrder = (orderId: string) => {
+    let orderToCancel: SalesOrder | undefined;
+
+    setSalesOrders(prevOrders =>
+      prevOrders.map(order => {
+        if (order.id === orderId && order.status !== 'Cancelado') {
+          orderToCancel = { ...order, status: 'Cancelado' };
+          return orderToCancel;
+        }
+        return order;
+      })
+    );
+
+    if (orderToCancel) {
+      // Return stock
+      setProducts(prevProducts => {
+        const updatedProducts = [...prevProducts];
+        (orderToCancel as SalesOrder).items.forEach(item => {
+          const productIndex = updatedProducts.findIndex(p => p.id === item.productId);
+          if (productIndex !== -1) {
+            updatedProducts[productIndex].stock += item.quantity;
+          }
+        });
+        return updatedProducts;
+      });
+      addNotification(`Pedido ${orderToCancel.number} foi cancelado.`, '/vendas/pedidos');
+    }
+  };
+
   const value = useMemo(() => ({
     products,
     salesOrders,
@@ -102,6 +132,7 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
     notifications,
     addSalesOrder,
     addPurchaseOrder,
+    cancelSalesOrder,
     markNotificationsAsRead,
   }), [products, salesOrders, customers, suppliers, purchaseOrders, notifications]);
 

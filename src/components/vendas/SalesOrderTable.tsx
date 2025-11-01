@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 
 interface SalesOrderTableProps {
   orders: SalesOrder[];
+  onViewDetails: (orderId: string) => void;
+  onCancel: (orderId: string) => void;
 }
 
 const statusStyles = {
@@ -16,7 +18,7 @@ const statusStyles = {
   Cancelado: "bg-red-500",
 };
 
-export const SalesOrderTable = ({ orders }: SalesOrderTableProps) => {
+export const SalesOrderTable = ({ orders, onViewDetails, onCancel }: SalesOrderTableProps) => {
   return (
     <div className="rounded-lg border shadow-sm bg-card">
       <Table>
@@ -48,8 +50,14 @@ export const SalesOrderTable = ({ orders }: SalesOrderTableProps) => {
                     <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem><Eye className="mr-2 h-4 w-4" /> Detalhes</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-500"><Trash2 className="mr-2 h-4 w-4" /> Cancelar</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onViewDetails(order.id)}><Eye className="mr-2 h-4 w-4" /> Detalhes</DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="text-red-500" 
+                      onClick={() => onCancel(order.id)}
+                      disabled={order.status === 'Cancelado'}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" /> Cancelar
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

@@ -1,14 +1,16 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
 import { SalesOrderTable } from "@/components/vendas/SalesOrderTable";
 import { useAppData } from "@/context/AppDataContext";
+import { showSuccess } from "@/utils/toast";
 
 const PedidosVenda = () => {
-  const { salesOrders } = useAppData();
+  const { salesOrders, cancelSalesOrder } = useAppData();
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const filteredOrders = useMemo(() => {
     if (!searchTerm) return salesOrders;
@@ -18,6 +20,17 @@ const PedidosVenda = () => {
       order.customerName.toLowerCase().includes(lowercasedTerm)
     );
   }, [salesOrders, searchTerm]);
+
+  const handleViewDetails = (orderId: string) => {
+    navigate(`/vendas/pedidos/${orderId}`);
+  };
+
+  const handleCancelOrder = (orderId: string) => {
+    if (window.confirm("Tem certeza que deseja cancelar este pedido? O estoque dos itens será revertido.")) {
+      cancelSalesOrder(orderId);
+      showSuccess("Pedido cancelado com sucesso!");
+    }
+  };
 
   return (
     <>
@@ -42,7 +55,11 @@ const PedidosVenda = () => {
           </Button>
         </div>
       </div>
-      <SalesOrderTable orders={filteredOrders} />
+      <SalesOrderTable 
+        orders={filteredOrders} 
+        onViewDetails={handleViewDetails}
+        onCancel={handleCancelOrder}
+      />
     </>
   );
 };
