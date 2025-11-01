@@ -10,6 +10,7 @@ import {
   Car,
   Users,
   Truck,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -40,6 +41,7 @@ const navItems = [
   },
   { to: "/mapa", label: "Mapa Interativo", Icon: Map },
   { to: "/relatorios", label: "Relatórios", Icon: BarChart3 },
+  { to: "/ia-insights", label: "IA Insights", Icon: Sparkles },
   { to: "/configuracoes", label: "Configurações", Icon: Settings },
 ];
 

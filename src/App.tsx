@@ -14,6 +14,7 @@ import PedidosVenda from "./pages/PedidosVenda";
 import NovoPedidoVenda from "./pages/NovoPedidoVenda";
 import Mapa from "./pages/Mapa";
 import Relatorios from "./pages/Relatorios";
+import IAInsights from "./pages/IAInsights";
 import Configuracoes from "./pages/Configuracoes";
 import { Layout } from "./components/Layout";
 import HistoricoCliente from "./pages/HistoricoCliente";
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/vendas/pedidos/novo" element={<NovoPedidoVenda />} />
               <Route path="/mapa" element={<Mapa />} />
               <Route path="/relatorios" element={<Relatorios />} />
+              <Route path="/ia-insights" element={<IAInsights />} />
               <Route path="/configuracoes" element={<Configuracoes />} />
             </Route>
             <Route path="*" element={<NotFound />} />
