@@ -77,7 +77,7 @@ const IAInsights = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
-          <h1 className="text-lg font-semibold md-text-2xl text-foreground">IA Insights</h1>
+          <h1 className="text-lg font-semibold md:text-2xl text-foreground">IA Insights</h1>
         </div>
       </div>
       <div className="grid gap-6 mt-4">
@@ -112,7 +112,7 @@ const IAInsights = () => {
               crossSellInsight,
               'A IA identificará padrões de compra em seu histórico de vendas para sugerir produtos que são frequentemente comprados juntos.'
             )}
-          </CardContent>
+          </-CardContent>
         </Card>
 
         <Card>
@@ -129,7 +129,7 @@ const IAInsights = () => {
               supplierInsight,
               'A IA avaliará os dados dos seus fornecedores, como status e histórico, para identificar riscos potenciais que possam impactar seu estoque.'
             )}
-          </CardContent>
+          </-CardContent>
         </Card>
       </div>
     </>
