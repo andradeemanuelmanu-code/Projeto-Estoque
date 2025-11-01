@@ -6,7 +6,7 @@ import { KpiCard } from "@/components/dashboard/KpiCard";
 import { StockAlertsCard } from "@/components/dashboard/StockAlertsCard";
 import { TopProductsCard } from "@/components/dashboard/TopProductsCard";
 import { MarginChartCard } from "@/components/dashboard/MarginChartCard";
-import { DashboardSalesByCategoryChart } from "@/components/dashboard/DashboardSalesByCategoryChart";
+import { OrderStatusChart } from "@/components/dashboard/OrderStatusChart";
 import { StockMovementChart } from "@/components/dashboard/StockMovementChart";
 
 const Index = () => {
@@ -40,11 +40,11 @@ const Index = () => {
       <div className="grid gap-4 md:gap-8 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Vendas por Categoria</CardTitle>
-            <CardDescription>Faturamento por categoria de produto este mês.</CardDescription>
+            <CardTitle>Status dos Pedidos de Venda</CardTitle>
+            <CardDescription>Distribuição dos pedidos por status este mês.</CardDescription>
           </CardHeader>
           <CardContent>
-            <DashboardSalesByCategoryChart />
+            <OrderStatusChart />
           </CardContent>
         </Card>
         <div className="lg:col-span-2">
