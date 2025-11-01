@@ -3,7 +3,32 @@
 @tailwind utilities;
 
 @layer base {
+  /* Novo tema "Latte" - Padrão do Sistema (Modo Claro) */
   :root {
+    --background: 24 44% 96%; /* Cream */
+    --foreground: 24 10% 10%; /* Dark Brown */
+    --card: 15 33% 99%; /* Lighter Cream */
+    --card-foreground: 24 10% 10%;
+    --popover: 15 33% 99%;
+    --popover-foreground: 24 10% 10%;
+    --primary: 24 90% 55%; /* Vibrant Orange */
+    --primary-foreground: 24 10% 98%;
+    --secondary: 30 50% 94%; /* Light Orange/Peach */
+    --secondary-foreground: 24 90% 55%;
+    --muted: 30 50% 94%;
+    --muted-foreground: 24 10% 45%;
+    --accent: 30 50% 90%;
+    --accent-foreground: 24 90% 55%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 30 40% 90%;
+    --input: 30 40% 90%;
+    --ring: 24 90% 55%;
+    --radius: 0.5rem;
+  }
+
+  /* Tema Claro (Azul Vibrante) */
+  .light {
     --background: 210 40% 98%;
     --foreground: 220 15% 25%;
     --card: 0 0% 100%;
@@ -23,9 +48,9 @@
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 220 90% 60%;
-    --radius: 0.5rem;
   }
 
+  /* Tema Escuro */
   .dark {
     --background: 215 48% 11%;
     --foreground: 210 40% 98%;
