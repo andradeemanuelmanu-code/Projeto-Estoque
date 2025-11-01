@@ -14,6 +14,7 @@ import Mapa from "./pages/Mapa";
 import Relatorios from "./pages/Relatorios";
 import Configuracoes from "./pages/Configuracoes";
 import { Layout } from "./components/Layout";
+import HistoricoCliente from "./pages/HistoricoCliente";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/compras/fornecedores" element={<Fornecedores />} />
             <Route path="/compras/pedidos" element={<PedidosCompra />} />
             <Route path="/vendas/clientes" element={<Clientes />} />
+            <Route path="/vendas/clientes/:customerId" element={<HistoricoCliente />} />
             <Route path="/vendas/pedidos" element={<PedidosVenda />} />
             <Route path="/mapa" element={<Mapa />} />
             <Route path="/relatorios" element={<Relatorios />} />

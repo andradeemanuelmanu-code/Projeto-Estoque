@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -34,7 +35,9 @@ export const CustomerCard = ({ customer, onEdit, onDelete }: CustomerCardProps) 
         <div className="flex items-start gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4 mt-0.5 shrink-0" /> <span>{customer.address}</span></div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full"><History className="mr-2 h-4 w-4" /> Ver Histórico</Button>
+        <Link to={`/vendas/clientes/${customer.id}`} className="w-full">
+          <Button variant="outline" className="w-full"><History className="mr-2 h-4 w-4" /> Ver Histórico</Button>
+        </Link>
       </CardFooter>
     </Card>
   );
