@@ -12,6 +12,7 @@ import Clientes from "./pages/Clientes";
 import PedidosVenda from "./pages/PedidosVenda";
 import Mapa from "./pages/Mapa";
 import Relatorios from "./pages/Relatorios";
+import Configuracoes from "./pages/Configuracoes";
 import { Layout } from "./components/Layout";
 
 const queryClient = new QueryClient();
@@ -32,9 +33,8 @@ const App = () => (
             <Route path="/vendas/pedidos" element={<PedidosVenda />} />
             <Route path="/mapa" element={<Mapa />} />
             <Route path="/relatorios" element={<Relatorios />} />
-            {/* Adicione outras rotas que usam o layout aqui */}
+            <Route path="/configuracoes" element={<Configuracoes />} />
           </Route>
-          {/* Rotas sem o layout principal (ex: login) podem ir aqui */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

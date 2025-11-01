@@ -1,0 +1,92 @@
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
+
+const Configuracoes = () => {
+  const { setTheme, theme } = useTheme();
+
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-semibold md:text-2xl text-foreground">Configurações</h1>
+      </div>
+      <div className="grid gap-6 mt-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Perfil da Empresa</CardTitle>
+            <CardDescription>Atualize as informações da sua empresa.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="company-name">Nome da Empresa</Label>
+              <Input id="company-name" defaultValue="Autoparts LTDA" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cnpj">CNPJ</Label>
+              <Input id="cnpj" defaultValue="00.000.000/0001-00" />
+            </div>
+            <div className="flex justify-end">
+              <Button>Salvar Alterações</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Aparência</CardTitle>
+            <CardDescription>Personalize a aparência do sistema.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup defaultValue={theme} onValueChange={setTheme} className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="light" id="light" />
+                <Label htmlFor="light">Claro</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="dark" id="dark" />
+                <Label htmlFor="dark">Escuro</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="system" id="system" />
+                <Label htmlFor="system">Padrão do Sistema</Label>
+              </div>
+            </RadioGroup>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Notificações</CardTitle>
+            <CardDescription>Gerencie como você recebe notificações.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div>
+                <Label htmlFor="low-stock">Alertas de estoque baixo</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receba notificações quando o estoque de um produto atingir o mínimo.
+                </p>
+              </div>
+              <Switch id="low-stock" defaultChecked />
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div>
+                <Label htmlFor="new-order">Notificações de novos pedidos</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receba notificações para cada novo pedido de venda recebido.
+                </p>
+              </div>
+              <Switch id="new-order" defaultChecked />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  );
+};
+
+export default Configuracoes;
