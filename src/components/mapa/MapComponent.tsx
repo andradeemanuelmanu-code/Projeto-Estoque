@@ -1,5 +1,9 @@
 import "leaflet/dist/leaflet.css";
-import "react-leaflet-markercluster/dist/styles.min.css";
+// The react-leaflet-markercluster component is a wrapper and doesn't bundle the CSS.
+// We need to import the CSS from the original leaflet.markercluster library.
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
