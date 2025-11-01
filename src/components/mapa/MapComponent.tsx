@@ -1,15 +1,13 @@
 import "leaflet/dist/leaflet.css";
-// The react-leaflet-markercluster component is a wrapper and doesn't bundle the CSS.
-// We need to import the CSS from the original leaflet.markercluster library.
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
-import MarkerClusterGroup from './MarkerCluster';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useEffect } from "react";
 
-// Define custom icons using inline SVG, similar to the previous implementation
+// Define custom icons using inline SVG
 const customerSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#3b82f6" width="32" height="32"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
 const supplierSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#22c55e" width="32" height="32"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
 
@@ -28,7 +26,7 @@ const supplierIcon = new L.DivIcon({
 });
 
 // Helper component to change map view when a location is selected
-const ChangeView = ({ center, zoom }) => {
+const ChangeView = ({ center, zoom }: { center: L.LatLngExpression | null, zoom: number }) => {
   const map = useMap();
   useEffect(() => {
     if (center) {
