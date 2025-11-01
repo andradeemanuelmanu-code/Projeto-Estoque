@@ -59,10 +59,21 @@ export const Header = () => {
         </form>
       </div>
 
-      <Button variant="outline" size="icon" className="h-8 w-8">
-        <Bell className="h-4 w-4" />
-        <span className="sr-only">Toggle notifications</span>
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon" className="h-8 w-8">
+            <Bell className="h-4 w-4" />
+            <span className="sr-only">Toggle notifications</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Notificações</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>Estoque baixo: Vela de Ignição</DropdownMenuItem>
+          <DropdownMenuItem>Novo pedido de venda recebido</DropdownMenuItem>
+          <DropdownMenuItem>Pedido de compra #PC-2024-002 recebido</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

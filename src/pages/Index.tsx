@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { DollarSign, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -41,7 +40,6 @@ const Index = () => {
           change="+20.1% do último mês"
           changeType="positive"
           Icon={DollarSign}
-          linkTo="/relatorios"
         />
         <KpiCard
           title="Giro de Estoque"
@@ -49,38 +47,33 @@ const Index = () => {
           change="-2.4% da última hora"
           changeType="negative"
           Icon={Activity}
-          linkTo="/estoque"
         />
         <StockAlertsCard />
-        <MarginChartCard linkTo="/relatorios" />
+        <MarginChartCard />
       </div>
       <div className="grid gap-4 md:gap-8 lg:grid-cols-5">
-        <Link to="/vendas/pedidos" className="lg:col-span-3 hover:opacity-90 transition-opacity">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Status dos Pedidos de Venda</CardTitle>
-              <CardDescription>Distribuição dos pedidos por status este mês.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <OrderStatusChart />
-            </CardContent>
-          </Card>
-        </Link>
-        <div className="lg:col-span-2">
-          <TopProductsCard linkTo="/relatorios" />
-        </div>
-      </div>
-      <Link to="/estoque" className="block hover:opacity-90 transition-opacity">
-        <Card>
+        <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Movimentação de Estoque</CardTitle>
-            <CardDescription>Entradas e saídas de unidades de produtos.</CardDescription>
+            <CardTitle>Status dos Pedidos de Venda</CardTitle>
+            <CardDescription>Distribuição dos pedidos por status este mês.</CardDescription>
           </CardHeader>
           <CardContent>
-            <StockMovementChart />
+            <OrderStatusChart />
           </CardContent>
         </Card>
-      </Link>
+        <div className="lg:col-span-2">
+          <TopProductsCard />
+        </div>
+      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Movimentação de Estoque</CardTitle>
+          <CardDescription>Entradas e saídas de unidades de produtos.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <StockMovementChart />
+        </CardContent>
+      </Card>
     </>
   );
 };
