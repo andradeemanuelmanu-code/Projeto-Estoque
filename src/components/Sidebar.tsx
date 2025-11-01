@@ -11,6 +11,7 @@ import {
   Users,
   Truck,
   Sparkles,
+  Route, // Importando o novo ícone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -40,6 +41,7 @@ const mainNavItems = [
     ],
   },
   { to: "/mapa", label: "Mapa Interativo", Icon: Map },
+  { to: "/otimizacao-rotas", label: "Otimização de Rotas", Icon: Route }, // Novo item
   { to: "/relatorios", label: "Relatórios", Icon: BarChart3 },
   { to: "/ia-insights", label: "IA Insights", Icon: Sparkles },
 ];
