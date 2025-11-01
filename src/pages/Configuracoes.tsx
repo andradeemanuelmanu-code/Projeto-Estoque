@@ -74,7 +74,7 @@ const Configuracoes = () => {
             <CardDescription>Personalize a aparência do sistema.</CardDescription>
           </CardHeader>
           <CardContent>
-            <RadioGroup defaultValue={theme} onValueChange={setTheme} className="space-y-2">
+            <RadioGroup value={theme} onValueChange={setTheme} className="space-y-2">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="light" id="light" />
                 <Label htmlFor="light">Claro</Label>
