@@ -97,7 +97,7 @@ export const Sidebar = () => {
                   </AccordionItem>
                 </Accordion>
               ) : (
-                <NavItem key={item.label} {...item} />
+                item.to && <NavItem key={item.label} to={item.to} label={item.label} Icon={item.Icon} />
               )
             )}
           </nav>

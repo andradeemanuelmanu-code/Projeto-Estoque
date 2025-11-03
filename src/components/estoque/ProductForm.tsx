@@ -47,7 +47,7 @@ export const ProductForm = ({ product, onSubmit, onCancel }: ProductFormProps) =
   });
 
   const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit(values);
+    onSubmit(values as Omit<Product, 'id' | 'stock'>);
   };
 
   return (
