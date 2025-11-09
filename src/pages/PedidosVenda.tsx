@@ -6,10 +6,9 @@ import { PlusCircle, Search } from "lucide-react";
 import { SalesOrderTable } from "@/components/vendas/SalesOrderTable";
 import { useAppData } from "@/context/AppDataContext";
 import { showSuccess } from "@/utils/toast";
-import { SalesOrder } from "@/data/salesOrders";
 
 const PedidosVenda = () => {
-  const { salesOrders, cancelSalesOrder, updateSalesOrderStatus } = useAppData();
+  const { salesOrders, cancelSalesOrder } = useAppData();
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
@@ -27,14 +26,9 @@ const PedidosVenda = () => {
   };
 
   const handleCancelOrder = (orderId: string) => {
-    if (window.confirm("Tem certeza que deseja cancelar este pedido? O estoque dos itens será revertido se o pedido já foi faturado.")) {
+    if (window.confirm("Tem certeza que deseja cancelar este pedido? O estoque dos itens será revertido.")) {
       cancelSalesOrder(orderId);
-    }
-  };
-
-  const handleStatusChange = (orderId: string, newStatus: SalesOrder['status']) => {
-    if (window.confirm(`Tem certeza que deseja alterar o status para "${newStatus}"? Isso pode afetar o estoque.`)) {
-      updateSalesOrderStatus(orderId, newStatus);
+      showSuccess("Pedido cancelado com sucesso!");
     }
   };
 
@@ -65,7 +59,6 @@ const PedidosVenda = () => {
         orders={filteredOrders} 
         onViewDetails={handleViewDetails}
         onCancel={handleCancelOrder}
-        onStatusChange={handleStatusChange}
       />
     </>
   );

@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
 import { PurchaseOrderTable } from "@/components/compras/PurchaseOrderTable";
 import { useAppData } from "@/context/AppDataContext";
-import { PurchaseOrder } from "@/data/purchaseOrders";
+import { showSuccess } from "@/utils/toast";
 
 const PedidosCompra = () => {
-  const { purchaseOrders, cancelPurchaseOrder, updatePurchaseOrderStatus } = useAppData();
+  const { purchaseOrders, cancelPurchaseOrder } = useAppData();
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
@@ -28,12 +28,7 @@ const PedidosCompra = () => {
   const handleCancelOrder = (orderId: string) => {
     if (window.confirm("Tem certeza que deseja cancelar este pedido? Se já foi recebido, o estoque será revertido.")) {
       cancelPurchaseOrder(orderId);
-    }
-  };
-
-  const handleStatusChange = (orderId: string, newStatus: PurchaseOrder['status']) => {
-    if (window.confirm(`Tem certeza que deseja alterar o status para "${newStatus}"? Isso pode afetar o estoque.`)) {
-      updatePurchaseOrderStatus(orderId, newStatus);
+      showSuccess("Pedido de compra cancelado com sucesso!");
     }
   };
 
@@ -64,7 +59,6 @@ const PedidosCompra = () => {
         orders={filteredOrders} 
         onViewDetails={handleViewDetails}
         onCancel={handleCancelOrder}
-        onStatusChange={handleStatusChange}
       />
     </>
   );

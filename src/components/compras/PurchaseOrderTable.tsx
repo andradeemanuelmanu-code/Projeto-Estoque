@@ -10,7 +10,6 @@ interface PurchaseOrderTableProps {
   orders: PurchaseOrder[];
   onViewDetails: (orderId: string) => void;
   onCancel: (orderId: string) => void;
-  onStatusChange: (orderId: string, newStatus: PurchaseOrder['status']) => void;
 }
 
 const statusStyles = {
@@ -19,9 +18,7 @@ const statusStyles = {
   Cancelado: "bg-red-500",
 };
 
-const availableStatuses: PurchaseOrder['status'][] = ["Pendente", "Recebido", "Cancelado"];
-
-export const PurchaseOrderTable = ({ orders, onViewDetails, onCancel, onStatusChange }: PurchaseOrderTableProps) => {
+export const PurchaseOrderTable = ({ orders, onViewDetails, onCancel }: PurchaseOrderTableProps) => {
   return (
     <div className="rounded-lg border shadow-sm bg-card">
       <Table>
@@ -42,22 +39,7 @@ export const PurchaseOrderTable = ({ orders, onViewDetails, onCancel, onStatusCh
               <TableCell>{order.supplierName}</TableCell>
               <TableCell>{new Date(order.date).toLocaleDateString('pt-BR')}</TableCell>
               <TableCell className="text-center">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Badge className={cn("text-white cursor-pointer", statusStyles[order.status])}>{order.status}</Badge>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center">
-                    {availableStatuses.map(status => (
-                      <DropdownMenuItem 
-                        key={status}
-                        disabled={order.status === status}
-                        onClick={() => onStatusChange(order.id, status)}
-                      >
-                        {status}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Badge className={cn("text-white", statusStyles[order.status])}>{order.status}</Badge>
               </TableCell>
               <TableCell className="text-right">
                 {order.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
