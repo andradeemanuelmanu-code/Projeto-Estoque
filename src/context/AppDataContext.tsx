@@ -13,7 +13,7 @@ export type Notification = {
   linkTo?: string;
 };
 
-interface AppDataContextType {
+export interface AppDataContextType {
   products: Product[];
   salesOrders: SalesOrder[];
   customers: Customer[];
@@ -27,7 +27,7 @@ interface AppDataContextType {
   markNotificationsAsRead: () => void;
 }
 
-const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
+export const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
 
 export const AppDataProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>(mockProducts);

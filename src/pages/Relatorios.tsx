@@ -10,10 +10,12 @@ import { showLoading, showSuccess, dismissToast, showError } from "@/utils/toast
 import { PdfDocument } from "@/components/pdf/PdfDocument";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useAppData } from "@/context/AppDataContext";
 
 const Relatorios = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
+  const appData = useAppData();
 
   const handleExportPDF = async () => {
     if (!pdfRef.current) return;
@@ -57,8 +59,7 @@ const Relatorios = () => {
   return (
     <>
       <div style={{ position: 'fixed', left: '-9999px', top: 0 }}>
-        {/* Renderiza o componente para referência, mesmo que a lógica principal o acesse diretamente */}
-        <PdfDocument ref={pdfRef} />
+        <PdfDocument ref={pdfRef} data={appData} />
       </div>
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl text-foreground">Relatórios Gerenciais</h1>

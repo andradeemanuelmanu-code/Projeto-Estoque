@@ -1,4 +1,5 @@
 import React from 'react';
+import { AppDataContext, AppDataContextType } from '@/context/AppDataContext';
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { StockAlertsCard } from "@/components/dashboard/StockAlertsCard";
 import { TopProductsCard } from "@/components/dashboard/TopProductsCard";
@@ -24,72 +25,78 @@ const PdfHeader = () => (
   </header>
 );
 
-export const PdfDocument = React.forwardRef<HTMLDivElement>((props, ref) => {
-  return (
-    <div
-      ref={ref}
-      className="bg-white text-black"
-      style={{
-        position: 'absolute',
-        left: '-9999px',
-        top: '0',
-        width: '210mm',
-        color: 'black',
-      }}
-    >
-      {/* Página 1 */}
-      <div className="pdf-page p-8" style={{ height: '297mm' }}>
-        <PdfHeader />
-        <main>
-          <section className="p-4 border rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Visão Geral do Dashboard</h2>
-            <div className="grid grid-cols-4 gap-4">
-              <KpiCard title="Faturamento Total" value="R$ 45.231,89" change="+20.1% do último mês" changeType="positive" Icon={DollarSign} />
-              <KpiCard title="Giro de Estoque" value="573" change="-2.4% da última hora" changeType="negative" Icon={Activity} />
-              <StockAlertsCard />
-              <MarginChartCard pdfMode={true} />
-            </div>
-            <div className="grid grid-cols-2 gap-6 mt-6">
-              <div className="space-y-2">
-                <h3 className="font-semibold text-center">Status dos Pedidos de Venda</h3>
-                <OrderStatusChart pdfMode={true} />
-              </div>
-              <div>
-                <TopProductsCard />
-              </div>
-            </div>
-            <div className="mt-6 space-y-2">
-              <h3 className="font-semibold text-center">Movimentação de Estoque</h3>
-              <StockMovementChart pdfMode={true} />
-            </div>
-          </section>
-        </main>
-      </div>
+interface PdfDocumentProps {
+  data: AppDataContextType;
+}
 
-      {/* Página 2 */}
-      <div className="pdf-page p-8" style={{ height: '297mm' }}>
-        <PdfHeader />
-        <main>
-          <section className="p-4 border rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Relatórios Gerenciais</h2>
-            <div className="grid grid-cols-1 gap-6">
-              <InventoryValueCard />
-              <div className="space-y-2">
-                  <h3 className="font-semibold text-center">Análise de Pareto de Produtos</h3>
-                  <ProductParetoChart pdfMode={true} />
+export const PdfDocument = React.forwardRef<HTMLDivElement, PdfDocumentProps>(({ data }, ref) => {
+  return (
+    <AppDataContext.Provider value={data}>
+      <div
+        ref={ref}
+        className="bg-white text-black"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          top: '0',
+          width: '210mm',
+          color: 'black',
+        }}
+      >
+        {/* Página 1 */}
+        <div className="pdf-page p-8" style={{ height: '297mm' }}>
+          <PdfHeader />
+          <main>
+            <section className="p-4 border rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">Visão Geral do Dashboard</h2>
+              <div className="grid grid-cols-4 gap-4">
+                <KpiCard title="Faturamento Total" value="R$ 45.231,89" change="+20.1% do último mês" changeType="positive" Icon={DollarSign} />
+                <KpiCard title="Giro de Estoque" value="573" change="-2.4% da última hora" changeType="negative" Icon={Activity} />
+                <StockAlertsCard />
+                <MarginChartCard pdfMode={true} />
               </div>
-              <div className="space-y-2">
-                  <h3 className="font-semibold text-center">Top 5 Clientes por Faturamento</h3>
-                  <TopCustomersChart pdfMode={true} />
+              <div className="grid grid-cols-2 gap-6 mt-6">
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-center">Status dos Pedidos de Venda</h3>
+                  <OrderStatusChart pdfMode={true} />
+                </div>
+                <div>
+                  <TopProductsCard />
+                </div>
               </div>
-              <div className="space-y-2">
-                  <h3 className="font-semibold text-center">Top 5 Fornecedores por Compras</h3>
-                  <PurchasesBySupplierChart pdfMode={true} />
+              <div className="mt-6 space-y-2">
+                <h3 className="font-semibold text-center">Movimentação de Estoque</h3>
+                <StockMovementChart pdfMode={true} />
               </div>
-            </div>
-          </section>
-        </main>
+            </section>
+          </main>
+        </div>
+
+        {/* Página 2 */}
+        <div className="pdf-page p-8" style={{ height: '297mm' }}>
+          <PdfHeader />
+          <main>
+            <section className="p-4 border rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">Relatórios Gerenciais</h2>
+              <div className="grid grid-cols-1 gap-6">
+                <InventoryValueCard />
+                <div className="space-y-2">
+                    <h3 className="font-semibold text-center">Análise de Pareto de Produtos</h3>
+                    <ProductParetoChart pdfMode={true} />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="font-semibold text-center">Top 5 Clientes por Faturamento</h3>
+                    <TopCustomersChart pdfMode={true} />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="font-semibold text-center">Top 5 Fornecedores por Compras</h3>
+                    <PurchasesBySupplierChart pdfMode={true} />
+                </div>
+              </div>
+            </section>
+          </main>
+        </div>
       </div>
-    </div>
+    </AppDataContext.Provider>
   );
 });

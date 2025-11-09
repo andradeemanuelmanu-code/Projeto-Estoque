@@ -1,12 +1,13 @@
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { mockPurchaseOrders } from '@/data/purchaseOrders';
+import { useAppData } from '@/context/AppDataContext';
 import { useMemo } from 'react';
 
 export const PurchasesBySupplierChart = ({ pdfMode = false }: { pdfMode?: boolean }) => {
+  const { purchaseOrders } = useAppData();
   const chartData = useMemo(() => {
     const purchasesBySupplier: { [key: string]: number } = {};
 
-    mockPurchaseOrders
+    purchaseOrders
       .filter(order => order.status === 'Recebido')
       .forEach(order => {
         if (!purchasesBySupplier[order.supplierName]) {
@@ -22,7 +23,7 @@ export const PurchasesBySupplierChart = ({ pdfMode = false }: { pdfMode?: boolea
       }))
       .sort((a, b) => b.Compras - a.Compras)
       .slice(0, 5);
-  }, []);
+  }, [purchaseOrders]);
 
   return (
     <div className="h-[350px]">
