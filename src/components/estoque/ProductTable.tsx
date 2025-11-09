@@ -35,7 +35,6 @@ export const ProductTable = ({ products, onEdit, onDelete, onViewHistory }: Prod
             <TableHead>Categoria</TableHead>
             <TableHead>Marca</TableHead>
             <TableHead className="text-center">Estoque Atual</TableHead>
-            <TableHead className="text-right">Preço</TableHead>
             <TableHead className="text-center">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -52,9 +51,6 @@ export const ProductTable = ({ products, onEdit, onDelete, onViewHistory }: Prod
                 ) : (
                   product.stock
                 )}
-              </TableCell>
-              <TableCell className="text-right">
-                {product.salePrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </TableCell>
               <TableCell className="text-center">
                 <DropdownMenu>

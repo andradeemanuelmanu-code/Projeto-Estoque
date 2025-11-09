@@ -17,7 +17,7 @@ const orderItemSchema = z.object({
   productId: z.string(),
   productName: z.string(),
   quantity: z.coerce.number().int().min(1),
-  unitPrice: z.number(),
+  unitPrice: z.coerce.number().min(0.01, "O preço deve ser maior que zero."),
 });
 
 const purchaseOrderSchema = z.object({
@@ -43,14 +43,15 @@ export const PurchaseOrderForm = ({ suppliers, products, onSubmit, onCancel }: P
   const { control, watch } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
-  const [currentItem, setCurrentItem] = useState({ productId: "", quantity: "1" });
+  const [currentItem, setCurrentItem] = useState({ productId: "", quantity: "1", unitPrice: "" });
 
   const handleAddItem = () => {
     const product = products.find(p => p.id === currentItem.productId);
     const quantity = parseInt(currentItem.quantity, 10);
+    const unitPrice = parseFloat(currentItem.unitPrice);
 
-    if (!product || !quantity || quantity <= 0) {
-      showError("Selecione um produto e informe uma quantidade válida.");
+    if (!product || !quantity || quantity <= 0 || !unitPrice || unitPrice <= 0) {
+      showError("Selecione um produto e informe quantidade e custo válidos.");
       return;
     }
     if (fields.some(field => field.productId === product.id)) {
@@ -62,9 +63,9 @@ export const PurchaseOrderForm = ({ suppliers, products, onSubmit, onCancel }: P
       productId: product.id,
       productName: product.description,
       quantity: quantity,
-      unitPrice: product.costPrice, // Use cost price for purchases
+      unitPrice: unitPrice,
     });
-    setCurrentItem({ productId: "", quantity: "1" });
+    setCurrentItem({ productId: "", quantity: "1", unitPrice: "" });
   };
 
   const orderItems = watch("items");
@@ -111,6 +112,10 @@ export const PurchaseOrderForm = ({ suppliers, products, onSubmit, onCancel }: P
               <FormItem>
                 <FormLabel>Quantidade</FormLabel>
                 <Input type="number" value={currentItem.quantity} onChange={e => setCurrentItem(prev => ({ ...prev, quantity: e.target.value }))} className="w-24" />
+              </FormItem>
+              <FormItem>
+                <FormLabel>Custo Unit.</FormLabel>
+                <Input type="number" placeholder="R$ 0,00" value={currentItem.unitPrice} onChange={e => setCurrentItem(prev => ({ ...prev, unitPrice: e.target.value }))} className="w-28" />
               </FormItem>
               <Button type="button" onClick={handleAddItem}><PlusCircle className="h-4 w-4 mr-2" /> Adicionar</Button>
             </div>
