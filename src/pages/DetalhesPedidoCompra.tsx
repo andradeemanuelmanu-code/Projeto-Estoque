@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAppData } from "@/context/AppDataContext";
 import NotFound from "./NotFound";
@@ -5,8 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { OrderStatusDialog } from "@/components/OrderStatusDialog";
+import { showSuccess } from "@/utils/toast";
+import { PurchaseOrder } from "@/data/purchaseOrders";
 
 const statusStyles = {
   Pendente: "bg-orange-500",
@@ -16,13 +20,21 @@ const statusStyles = {
 
 const DetalhesPedidoCompra = () => {
   const { orderId } = useParams<{ orderId: string }>();
-  const { purchaseOrders } = useAppData();
+  const { purchaseOrders, updatePurchaseOrderStatus } = useAppData();
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
   const order = purchaseOrders.find(o => o.id === orderId);
 
   if (!order) {
     return <NotFound />;
   }
+
+  const handleStatusSave = (newStatus: string) => {
+    if (order) {
+      updatePurchaseOrderStatus(order.id, newStatus as PurchaseOrder['status']);
+      showSuccess("Status do pedido atualizado com sucesso!");
+    }
+  };
 
   return (
     <>
@@ -51,9 +63,12 @@ const DetalhesPedidoCompra = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Status:</span>
               <Badge className={cn("text-white", statusStyles[order.status])}>{order.status}</Badge>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsStatusModalOpen(true)}>
+                <Pencil className="h-4 w-4 text-muted-foreground" />
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -98,6 +113,17 @@ const DetalhesPedidoCompra = () => {
             </CardContent>
         </Card>
       </div>
+
+      {order && (
+        <OrderStatusDialog
+          isOpen={isStatusModalOpen}
+          onOpenChange={setIsStatusModalOpen}
+          currentStatus={order.status}
+          availableStatuses={["Pendente", "Recebido", "Cancelado"]}
+          onSave={handleStatusSave}
+          orderNumber={order.number}
+        />
+      )}
     </>
   );
 };
