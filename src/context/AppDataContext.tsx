@@ -55,100 +55,109 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addSalesOrder = useCallback((orderData: Omit<SalesOrder, 'id' | 'number'>) => {
-    setSalesOrders(prevOrders => {
-      const newOrderNumber = `PV-2024-${(prevOrders.length + 1).toString().padStart(3, '0')}`;
-      const newOrder: SalesOrder = { id: `so_${Date.now()}`, number: newOrderNumber, ...orderData };
+    const newOrderNumber = `PV-2024-${(salesOrders.length + 1).toString().padStart(3, '0')}`;
+    const newOrder: SalesOrder = { id: `so_${Date.now()}`, number: newOrderNumber, ...orderData };
+    
+    setSalesOrders(prevOrders => [newOrder, ...prevOrders]);
 
+    setProducts(prevProducts => {
+      const updatedProducts = [...prevProducts];
+      newOrder.items.forEach(item => {
+        const productIndex = updatedProducts.findIndex(p => p.id === item.productId);
+        if (productIndex !== -1) {
+          const product = updatedProducts[productIndex];
+          const oldStock = product.stock;
+          const newStock = oldStock - item.quantity;
+          updatedProducts[productIndex].stock = newStock;
+
+          if (newStock <= product.minStock && oldStock > product.minStock) {
+            addNotification(`Estoque baixo: ${product.description}`, '/estoque');
+          }
+        }
+      });
+      return updatedProducts;
+    });
+  }, [salesOrders.length, addNotification]);
+
+  const addPurchaseOrder = useCallback((orderData: Omit<PurchaseOrder, 'id' | 'number'>) => {
+    const newOrderNumber = `PC-2024-${(purchaseOrders.length + 1).toString().padStart(3, '0')}`;
+    const newOrder: PurchaseOrder = { id: `po_${Date.now()}`, number: newOrderNumber, ...orderData };
+    
+    setPurchaseOrders(prevOrders => [newOrder, ...prevOrders]);
+
+    if (newOrder.status === 'Recebido') {
       setProducts(prevProducts => {
         const updatedProducts = [...prevProducts];
         newOrder.items.forEach(item => {
           const productIndex = updatedProducts.findIndex(p => p.id === item.productId);
           if (productIndex !== -1) {
-            const product = updatedProducts[productIndex];
-            const oldStock = product.stock;
-            const newStock = oldStock - item.quantity;
-            updatedProducts[productIndex].stock = newStock;
-
-            if (newStock <= product.minStock && oldStock > product.minStock) {
-              addNotification(`Estoque baixo: ${product.description}`, '/estoque');
-            }
+            updatedProducts[productIndex].stock += item.quantity;
           }
         });
         return updatedProducts;
       });
-      
-      return [newOrder, ...prevOrders];
-    });
-  }, [addNotification]);
-
-  const addPurchaseOrder = useCallback((orderData: Omit<PurchaseOrder, 'id' | 'number'>) => {
-    setPurchaseOrders(prevOrders => {
-      const newOrderNumber = `PC-2024-${(prevOrders.length + 1).toString().padStart(3, '0')}`;
-      const newOrder: PurchaseOrder = { id: `po_${Date.now()}`, number: newOrderNumber, ...orderData };
-
-      if (newOrder.status === 'Recebido') {
-        setProducts(prevProducts => {
-          const updatedProducts = [...prevProducts];
-          newOrder.items.forEach(item => {
-            const productIndex = updatedProducts.findIndex(p => p.id === item.productId);
-            if (productIndex !== -1) {
-              updatedProducts[productIndex].stock += item.quantity;
-            }
-          });
-          return updatedProducts;
-        });
-      }
-      return [newOrder, ...prevOrders];
-    });
-  }, []);
+    }
+  }, [purchaseOrders.length]);
 
   const updateSalesOrderStatus = useCallback((orderId: string, newStatus: SalesOrder['status']) => {
-    setSalesOrders(prevOrders => {
-      const order = prevOrders.find(o => o.id === orderId);
-      if (!order || order.status === newStatus) return prevOrders;
+    const order = salesOrders.find(o => o.id === orderId);
+    if (!order || order.status === newStatus) return;
 
-      const oldStatus = order.status;
+    const oldStatus = order.status;
+    let stockAdjustment = 0;
 
-      if (oldStatus !== 'Faturado' && newStatus === 'Faturado') {
-        setProducts(prev => prev.map(p => {
-          const item = order.items.find(i => i.productId === p.id);
-          return item ? { ...p, stock: p.stock - item.quantity } : p;
-        }));
-      } else if (oldStatus === 'Faturado' && newStatus !== 'Faturado') {
-        setProducts(prev => prev.map(p => {
-          const item = order.items.find(i => i.productId === p.id);
-          return item ? { ...p, stock: p.stock + item.quantity } : p;
-        }));
-      }
+    if (oldStatus !== 'Faturado' && newStatus === 'Faturado') {
+      stockAdjustment = -1; // Decrease stock
+    } else if (oldStatus === 'Faturado' && newStatus !== 'Faturado') {
+      stockAdjustment = 1; // Increase stock
+    }
 
-      addNotification(`Status do pedido ${order.number} atualizado para ${newStatus}.`, `/vendas/pedidos/${orderId}`);
-      return prevOrders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
-    });
-  }, [addNotification]);
+    if (stockAdjustment !== 0) {
+      setProducts(prevProducts => {
+        const updatedProducts = [...prevProducts];
+        order.items.forEach(item => {
+          const productIndex = updatedProducts.findIndex(p => p.id === item.productId);
+          if (productIndex !== -1) {
+            updatedProducts[productIndex].stock += item.quantity * stockAdjustment;
+          }
+        });
+        return updatedProducts;
+      });
+    }
+
+    setSalesOrders(prevOrders => prevOrders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    addNotification(`Status do pedido ${order.number} atualizado para ${newStatus}.`, `/vendas/pedidos/${orderId}`);
+  }, [salesOrders, addNotification]);
 
   const updatePurchaseOrderStatus = useCallback((orderId: string, newStatus: PurchaseOrder['status']) => {
-    setPurchaseOrders(prevOrders => {
-      const order = prevOrders.find(o => o.id === orderId);
-      if (!order || order.status === newStatus) return prevOrders;
+    const order = purchaseOrders.find(o => o.id === orderId);
+    if (!order || order.status === newStatus) return;
 
-      const oldStatus = order.status;
+    const oldStatus = order.status;
+    let stockAdjustment = 0;
 
-      if (oldStatus !== 'Recebido' && newStatus === 'Recebido') {
-        setProducts(prev => prev.map(p => {
-          const item = order.items.find(i => i.productId === p.id);
-          return item ? { ...p, stock: p.stock + item.quantity } : p;
-        }));
-      } else if (oldStatus === 'Recebido' && newStatus !== 'Recebido') {
-        setProducts(prev => prev.map(p => {
-          const item = order.items.find(i => i.productId === p.id);
-          return item ? { ...p, stock: p.stock - item.quantity } : p;
-        }));
-      }
+    if (oldStatus !== 'Recebido' && newStatus === 'Recebido') {
+      stockAdjustment = 1; // Increase stock
+    } else if (oldStatus === 'Recebido' && newStatus !== 'Recebido') {
+      stockAdjustment = -1; // Decrease stock
+    }
 
-      addNotification(`Status do pedido ${order.number} atualizado para ${newStatus}.`, `/compras/pedidos/${orderId}`);
-      return prevOrders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
-    });
-  }, [addNotification]);
+    if (stockAdjustment !== 0) {
+      setProducts(prevProducts => {
+        const updatedProducts = [...prevProducts];
+        order.items.forEach(item => {
+          const productIndex = updatedProducts.findIndex(p => p.id === item.productId);
+          if (productIndex !== -1) {
+            updatedProducts[productIndex].stock += item.quantity * stockAdjustment;
+          }
+        });
+        return updatedProducts;
+      });
+    }
+
+    setPurchaseOrders(prevOrders => prevOrders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    addNotification(`Status do pedido ${order.number} atualizado para ${newStatus}.`, `/compras/pedidos/${orderId}`);
+  }, [purchaseOrders, addNotification]);
 
   const cancelSalesOrder = useCallback((orderId: string) => updateSalesOrderStatus(orderId, 'Cancelado'), [updateSalesOrderStatus]);
   const cancelPurchaseOrder = useCallback((orderId: string) => updatePurchaseOrderStatus(orderId, 'Cancelado'), [updatePurchaseOrderStatus]);
