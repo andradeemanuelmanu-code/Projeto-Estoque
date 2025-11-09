@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { DollarSign, Activity } from "lucide-react";
+import { Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { KpiCard } from "@/components/dashboard/KpiCard";
@@ -9,21 +9,11 @@ import { MarginChartCard } from "@/components/dashboard/MarginChartCard";
 import { OrderStatusChart } from "@/components/dashboard/OrderStatusChart";
 import { StockMovementChart } from "@/components/dashboard/StockMovementChart";
 import { useAppData } from "@/context/AppDataContext";
+import { InventoryValueCard } from "@/components/relatorios/InventoryValueCard";
 
 const Index = () => {
   const [period, setPeriod] = useState('month');
   const { salesOrders } = useAppData();
-
-  const totalRevenue = useMemo(() => {
-    return salesOrders
-      .filter(order => order.status === 'Faturado')
-      .reduce((acc, order) => acc + order.totalValue, 0);
-  }, [salesOrders]);
-
-  const formattedTotalRevenue = totalRevenue.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  });
 
   const itemsSold = useMemo(() => {
     return salesOrders
@@ -55,13 +45,7 @@ const Index = () => {
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <KpiCard
-          title="Faturamento Total"
-          value={formattedTotalRevenue}
-          change="+20.1% do último mês"
-          changeType="positive"
-          Icon={DollarSign}
-        />
+        <InventoryValueCard />
         <KpiCard
           title="Itens Vendidos"
           value={itemsSold.toString()}

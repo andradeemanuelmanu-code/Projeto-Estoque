@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { File, Loader2 } from "lucide-react";
 import { ReportCard } from "@/components/relatorios/ReportCard";
 import { ProductParetoChart } from "@/components/relatorios/ProductParetoChart";
-import { InventoryValueCard } from "@/components/relatorios/InventoryValueCard";
 import { TopCustomersChart } from "@/components/relatorios/TopCustomersChart";
 import { PurchasesBySupplierChart } from "@/components/relatorios/PurchasesBySupplierChart";
 import { showLoading, showSuccess, dismissToast, showError } from "@/utils/toast";
@@ -11,6 +10,7 @@ import { PdfDocument } from "@/components/pdf/PdfDocument";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useAppData } from "@/context/AppDataContext";
+import { TotalRevenueCard } from "@/components/relatorios/TotalRevenueCard";
 
 const Relatorios = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -78,7 +78,7 @@ const Relatorios = () => {
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mt-4">
-        <InventoryValueCard />
+        <TotalRevenueCard />
         <ReportCard
           title="Análise de Pareto de Produtos"
           description="Produtos que representam a maior parte do faturamento (Curva ABC)."
