@@ -23,6 +23,16 @@ const Estoque = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
+  const categories = useMemo(() => {
+    const categorySet = new Set(globalProducts.map(p => p.category));
+    return Array.from(categorySet).sort();
+  }, [globalProducts]);
+
+  const brands = useMemo(() => {
+    const brandSet = new Set(globalProducts.map(p => p.brand));
+    return Array.from(brandSet).sort();
+  }, [globalProducts]);
+
   const filteredProducts = useMemo(() => {
     const sourceProducts = products.map(p => {
       const globalProduct = globalProducts.find(gp => gp.id === p.id);
@@ -114,6 +124,8 @@ const Estoque = () => {
             product={editingProduct}
             onSubmit={handleSaveProduct}
             onCancel={handleCloseModal}
+            categories={categories}
+            brands={brands}
           />
         </DialogContent>
       </Dialog>

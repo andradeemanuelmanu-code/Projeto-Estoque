@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Product } from "@/data/products";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formSchema = z.object({
   code: z.string().min(1, "Código é obrigatório."),
@@ -26,9 +27,11 @@ interface ProductFormProps {
   product: Product | null;
   onSubmit: (data: Omit<Product, 'id' | 'stock'>) => void;
   onCancel: () => void;
+  categories: string[];
+  brands: string[];
 }
 
-export const ProductForm = ({ product, onSubmit, onCancel }: ProductFormProps) => {
+export const ProductForm = ({ product, onSubmit, onCancel, categories, brands }: ProductFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,14 +69,36 @@ export const ProductForm = ({ product, onSubmit, onCancel }: ProductFormProps) =
           <FormField control={form.control} name="category" render={({ field }) => (
             <FormItem>
               <FormLabel>Categoria</FormLabel>
-              <FormControl><Input placeholder="Ex: Ignição" {...field} /></FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories.map(category => (
+                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )} />
           <FormField control={form.control} name="brand" render={({ field }) => (
             <FormItem>
               <FormLabel>Marca</FormLabel>
-              <FormControl><Input placeholder="Ex: NGK" {...field} /></FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma marca" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {brands.map(brand => (
+                    <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )} />
