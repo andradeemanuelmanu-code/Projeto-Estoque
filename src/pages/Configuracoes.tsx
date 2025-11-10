@@ -11,21 +11,23 @@ import { showSuccess } from "@/utils/toast";
 const Configuracoes = () => {
   const { setTheme, theme } = useTheme();
   
-  // Estado para o perfil da empresa
   const [companyName, setCompanyName] = useState("Autoparts LTDA");
   const [cnpj, setCnpj] = useState("00.000.000/0001-00");
 
-  // Estado para as notificações
-  const [lowStockAlerts, setLowStockAlerts] = useState(true);
   const [newOrderNotifications, setNewOrderNotifications] = useState(true);
 
+  const [lowStockAlerts, setLowStockAlerts] = useState(() => {
+    const saved = localStorage.getItem('user_settings_enableStockAlerts');
+    return saved !== 'false'; // Default to true if not set or is 'true'
+  });
+
   const handleProfileSave = () => {
-    // Aqui iria a lógica para salvar no backend
     showSuccess("Perfil da empresa atualizado com sucesso!");
   };
 
   const handleLowStockChange = (checked: boolean) => {
     setLowStockAlerts(checked);
+    localStorage.setItem('user_settings_enableStockAlerts', String(checked));
     showSuccess(`Alertas de estoque baixo ${checked ? 'ativados' : 'desativados'}.`);
   };
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useEffect } from 'react';
 import { mockProducts, Product } from '@/data/products';
 import { mockSalesOrders, SalesOrder } from '@/data/salesOrders';
 import { mockCustomers, Customer } from '@/data/customers';
@@ -27,9 +27,26 @@ export interface AppDataContextType {
   updateSalesOrderStatus: (orderId: string, newStatus: SalesOrder['status']) => void;
   updatePurchaseOrderStatus: (orderId: string, newStatus: PurchaseOrder['status']) => void;
   markNotificationsAsRead: () => void;
+  markSingleNotificationAsRead: (notificationId: string) => void;
 }
 
 export const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
+
+const loadNotificationsFromStorage = (): Notification[] => {
+  try {
+    const storedNotifications = localStorage.getItem('autoparts_notifications');
+    if (storedNotifications) {
+      // Garante que as datas sejam objetos Date
+      return JSON.parse(storedNotifications).map((n: any) => ({
+        ...n,
+        createdAt: new Date(n.createdAt),
+      }));
+    }
+  } catch (error) {
+    console.error("Failed to load notifications from localStorage", error);
+  }
+  return [];
+};
 
 export const AppDataProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>(mockProducts);
@@ -37,9 +54,20 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
   const [customers] = useState<Customer[]>(mockCustomers);
   const [suppliers] = useState<Supplier[]>(mockSuppliers);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(mockPurchaseOrders);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>(loadNotificationsFromStorage);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('autoparts_notifications', JSON.stringify(notifications));
+    } catch (error) {
+      console.error("Failed to save notifications to localStorage", error);
+    }
+  }, [notifications]);
 
   const addNotification = (message: string, linkTo?: string) => {
+    const alertsEnabled = localStorage.getItem('user_settings_enableStockAlerts') !== 'false';
+    if (!alertsEnabled) return;
+
     const newNotification: Notification = {
       id: `notif_${Date.now()}`,
       message,
@@ -52,6 +80,12 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
 
   const markNotificationsAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const markSingleNotificationAsRead = (notificationId: string) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
+    );
   };
 
   const addSalesOrder = (orderData: Omit<SalesOrder, 'id' | 'number'>) => {
@@ -211,6 +245,7 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
     updateSalesOrderStatus,
     updatePurchaseOrderStatus,
     markNotificationsAsRead,
+    markSingleNotificationAsRead,
   }), [products, salesOrders, customers, suppliers, purchaseOrders, notifications]);
 
   return (

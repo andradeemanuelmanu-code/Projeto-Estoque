@@ -63,7 +63,7 @@ const MobileNavLink = ({ to, children }: { to: string, children: React.ReactNode
 );
 
 export const Header = () => {
-  const { notifications, markNotificationsAsRead } = useAppData();
+  const { notifications, markNotificationsAsRead, markSingleNotificationAsRead } = useAppData();
   const hasUnreadNotifications = notifications.some(n => !n.read);
   const location = useLocation();
 
@@ -123,7 +123,7 @@ export const Header = () => {
 
       <div className="w-full flex-1" />
 
-      <DropdownMenu onOpenChange={(open) => { if (open && hasUnreadNotifications) markNotificationsAsRead(); }}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="icon" className="h-8 w-8 relative">
             <Bell className={cn("h-4 w-4", hasUnreadNotifications && "text-red-500 animate-bell-shake")} />
@@ -137,16 +137,26 @@ export const Header = () => {
           <DropdownMenuLabel>Notificações</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {notifications.length > 0 ? (
-            notifications.slice(0, 5).map(notification => (
-              <DropdownMenuItem key={notification.id} asChild className="cursor-pointer">
-                <Link to={notification.linkTo || '#'} className="flex flex-col items-start p-2">
-                  <p className={cn("text-sm whitespace-normal", !notification.read && "font-semibold")}>{notification.message}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {new Date(notification.createdAt).toLocaleString('pt-BR')}
-                  </p>
-                </Link>
-              </DropdownMenuItem>
-            ))
+            <>
+              {notifications.slice(0, 5).map(notification => (
+                <DropdownMenuItem key={notification.id} asChild className="cursor-pointer" onClick={() => markSingleNotificationAsRead(notification.id)}>
+                  <Link to={notification.linkTo || '#'} className="flex flex-col items-start p-2">
+                    <p className={cn("text-sm whitespace-normal", !notification.read && "font-semibold")}>{notification.message}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {new Date(notification.createdAt).toLocaleString('pt-BR')}
+                    </p>
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+              {hasUnreadNotifications && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} onClick={markNotificationsAsRead} className="justify-center text-sm">
+                    Marcar todas como lidas
+                  </DropdownMenuItem>
+                </>
+              )}
+            </>
           ) : (
             <div className="p-4 text-center text-sm text-muted-foreground">Nenhuma notificação</div>
           )}

@@ -31,9 +31,12 @@ const Index = () => {
 
   useEffect(() => {
     const lowStock = products.filter(p => p.stock <= p.minStock);
-    if (lowStock.length > 0) {
+    const alertShown = sessionStorage.getItem('lowStockAlertShown');
+
+    if (lowStock.length > 0 && !alertShown) {
       setLowStockProducts(lowStock);
       setIsLowStockAlertOpen(true);
+      sessionStorage.setItem('lowStockAlertShown', 'true');
     }
   }, [products]);
 
