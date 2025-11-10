@@ -50,8 +50,8 @@ const getAIResponse = (message: string, context: AppDataContextType): string => 
       return "A página 'IA Insights' oferece análises preditivas geradas por inteligência artificial, como previsão de demanda, oportunidades de venda cruzada e análise de risco de fornecedores, para ajudar na tomada de decisões estratégicas.";
   }
 
-  // Default response for off-topic questions
-  return "Posso responder apenas sobre o sistema e sobre análises relacionadas aos dados da loja de autopeças.";
+  // Default response for other questions
+  return "Essa é uma pergunta interessante! No momento, meu conhecimento é focado em te ajudar com a gestão da sua loja, então não tenho a resposta para isso. Mas estou sempre aprendendo! Quer tentar outra pergunta sobre suas vendas ou estoque?";
 };
 
 
