@@ -11,7 +11,8 @@ import {
   Users,
   Truck,
   Sparkles,
-  Route, // Importando o novo ícone
+  Route,
+  MessageSquare, // Importando o novo ícone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -41,14 +42,15 @@ const mainNavItems = [
     ],
   },
   { to: "/mapa", label: "Mapa Interativo", Icon: Map },
-  { to: "/otimizacao-rotas", label: "Otimização de Rotas", Icon: Route }, // Novo item
+  { to: "/otimizacao-rotas", label: "Otimização de Rotas", Icon: Route },
   { to: "/relatorios", label: "Relatórios", Icon: BarChart3 },
   { to: "/ia-insights", label: "IA Insights", Icon: Sparkles },
+  { to: "/falar-com-deus", label: "Falar com Deus", Icon: MessageSquare }, // Novo item
 ];
 
 const footerNavItem = { to: "/configuracoes", label: "Configurações", Icon: Settings };
 
-const NavItem = ({ to, label, Icon }) => (
+const NavItem = ({ to, label, Icon }: { to: string; label: string; Icon: React.ElementType }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
