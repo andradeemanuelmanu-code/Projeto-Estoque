@@ -35,7 +35,7 @@ const FalarComDeus = () => {
         throw new Error("A chave da API do Gemini não está configurada no arquivo .env.local.");
       }
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`;
       
       const history = currentMessages.map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'model',
