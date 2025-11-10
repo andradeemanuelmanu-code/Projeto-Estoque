@@ -11,7 +11,8 @@ import {
   Users,
   Truck,
   Sparkles,
-  Route, // Importando o novo ícone
+  Route,
+  Bot, // Importando o novo ícone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -44,6 +45,7 @@ const mainNavItems = [
   { to: "/otimizacao-rotas", label: "Otimização de Rotas", Icon: Route }, // Novo item
   { to: "/relatorios", label: "Relatórios", Icon: BarChart3 },
   { to: "/ia-insights", label: "IA Insights", Icon: Sparkles },
+  { to: "/falar-com-deus", label: "Falar com Deus", Icon: Bot }, // Novo item
 ];
 
 const footerNavItem = { to: "/configuracoes", label: "Configurações", Icon: Settings };
