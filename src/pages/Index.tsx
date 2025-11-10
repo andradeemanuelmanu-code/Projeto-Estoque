@@ -30,13 +30,31 @@ const Index = () => {
   const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const lowStock = products.filter(p => p.stock <= p.minStock);
-    const alertShown = sessionStorage.getItem('lowStockAlertShown');
+    // 1. Identificar todos os produtos com estoque baixo atualmente.
+    const currentLowStockProducts = products.filter(p => p.stock <= p.minStock);
 
-    if (lowStock.length > 0 && !alertShown) {
-      setLowStockProducts(lowStock);
+    if (currentLowStockProducts.length === 0) {
+      return; // Se não há produtos com estoque baixo, não faz nada.
+    }
+
+    // 2. Recuperar os IDs dos produtos cujos alertas já foram exibidos nesta sessão.
+    const shownAlertsRaw = sessionStorage.getItem('shownLowStockProductIds');
+    const shownProductIds: string[] = shownAlertsRaw ? JSON.parse(shownAlertsRaw) : [];
+
+    // 3. Filtrar para encontrar apenas os produtos que são novos alertas.
+    const newProductsToShow = currentLowStockProducts.filter(
+      p => !shownProductIds.includes(p.id)
+    );
+
+    // 4. Se houver novos produtos para alertar, mostrar o pop-up.
+    if (newProductsToShow.length > 0) {
+      setLowStockProducts(newProductsToShow);
       setIsLowStockAlertOpen(true);
-      sessionStorage.setItem('lowStockAlertShown', 'true');
+
+      // 5. Atualizar a lista de alertas exibidos na sessão.
+      const newShownIds = newProductsToShow.map(p => p.id);
+      const updatedShownIds = [...new Set([...shownProductIds, ...newShownIds])];
+      sessionStorage.setItem('shownLowStockProductIds', JSON.stringify(updatedShownIds));
     }
   }, [products]);
 
