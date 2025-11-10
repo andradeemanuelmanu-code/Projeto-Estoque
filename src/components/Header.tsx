@@ -1,5 +1,8 @@
-import { Link } from "react-router-dom";
-import { Menu, Wrench, Bell, CircleUser } from "lucide-react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import {
+  Menu, Wrench, Bell, CircleUser, LayoutDashboard, Package, ShoppingCart,
+  ClipboardList, Map, BarChart3, Settings, Users, Truck, Sparkles, Route
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,21 +13,59 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useAppData } from "@/context/AppDataContext";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-    { to: "/", label: "Dashboard" },
-    { to: "/estoque", label: "Estoque" },
-    { to: "/vendas/pedidos", label: "Vendas" },
-    { to: "/compras/pedidos", label: "Compras" },
-    { to: "/relatorios", label: "Relatórios" },
-    { to: "/mapa", label: "Mapa" },
+  { to: "/", label: "Dashboard", Icon: LayoutDashboard },
+  { to: "/estoque", label: "Estoque", Icon: Package },
+  {
+    label: "Vendas",
+    Icon: ShoppingCart,
+    subItems: [
+      { to: "/vendas/clientes", label: "Clientes", Icon: Users },
+      { to: "/vendas/pedidos", label: "Pedidos de Venda", Icon: ClipboardList },
+    ],
+  },
+  {
+    label: "Compras",
+    Icon: ClipboardList,
+    subItems: [
+      { to: "/compras/fornecedores", label: "Fornecedores", Icon: Users },
+      { to: "/compras/pedidos", label: "Pedidos de Compra", Icon: Truck },
+    ],
+  },
+  { to: "/mapa", label: "Mapa Interativo", Icon: Map },
+  { to: "/otimizacao-rotas", label: "Otimização de Rotas", Icon: Route },
+  { to: "/relatorios", label: "Relatórios", Icon: BarChart3 },
+  { to: "/ia-insights", label: "IA Insights", Icon: Sparkles },
+  { to: "/configuracoes", label: "Configurações", Icon: Settings },
 ];
+
+const MobileNavLink = ({ to, children }: { to: string, children: React.ReactNode }) => (
+  <NavLink
+    to={to}
+    className={({ isActive }) =>
+      cn(
+        "flex items-center gap-4 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary",
+        isActive && "bg-muted text-primary"
+      )
+    }
+  >
+    {children}
+  </NavLink>
+);
 
 export const Header = () => {
   const { notifications, markNotificationsAsRead } = useAppData();
   const hasUnreadNotifications = notifications.some(n => !n.read);
+  const location = useLocation();
 
   return (
     <header className="flex h-16 items-center gap-4 border-b bg-card px-4 lg:px-6">
@@ -35,17 +76,47 @@ export const Header = () => {
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="flex flex-col bg-card">
-          <nav className="grid gap-2 text-lg font-medium">
-            <Link to="/" className="flex items-center gap-3 text-lg font-semibold mb-4 px-2.5">
+        <SheetContent side="left" className="flex flex-col bg-card p-0">
+          <div className="flex h-16 items-center border-b px-4">
+            <Link to="/" className="flex items-center gap-3 font-semibold">
               <Wrench className="h-7 w-7 text-primary" />
-              <span className="text-xl text-foreground">Autoparts</span>
+              <span className="text-xl">Autoparts</span>
             </Link>
-            {navItems.map(item => (
-                <Link key={item.label} to={item.to} className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground">
-                    {item.label}
-                </Link>
-            ))}
+          </div>
+          <nav className="flex-1 overflow-y-auto p-4">
+            <div className="grid gap-2 text-base font-medium">
+              {navItems.map((item) =>
+                item.subItems ? (
+                  <Accordion key={item.label} type="single" collapsible defaultValue={item.subItems.some(p => location.pathname.startsWith(p.to)) ? item.label : ""}>
+                    <AccordionItem value={item.label} className="border-b-0">
+                      <AccordionTrigger className="py-3 hover:no-underline rounded-lg px-3 [&[data-state=open]]:bg-muted">
+                        <div className={cn("flex items-center gap-4 text-muted-foreground", { "text-primary": item.subItems.some(p => location.pathname.startsWith(p.to)) })}>
+                          <item.Icon className="h-5 w-5" />
+                          {item.label}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-1">
+                        <div className="flex flex-col gap-1 pl-8">
+                          {item.subItems.map((subItem) => (
+                            <MobileNavLink key={subItem.to} to={subItem.to}>
+                              <subItem.Icon className="h-5 w-5" />
+                              {subItem.label}
+                            </MobileNavLink>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                ) : (
+                  item.to && (
+                    <MobileNavLink key={item.to} to={item.to}>
+                      <item.Icon className="h-5 w-5" />
+                      {item.label}
+                    </MobileNavLink>
+                  )
+                )
+              )}
+            </div>
           </nav>
         </SheetContent>
       </Sheet>
