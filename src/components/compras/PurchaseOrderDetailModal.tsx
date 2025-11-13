@@ -43,14 +43,14 @@ export const PurchaseOrderDetailModal = ({ order, isOpen, onOpenChange }: Purcha
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-3xl">
+        <DialogContent className="sm:max-w-3xl max-w-[95vw] h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Detalhes do Pedido de Compra</DialogTitle>
             <DialogDescription>Pedido #{order.number}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card className="md:col-span-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Card className="md:col-span-3 lg:col-span-3">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="text-base">Informações Gerais</CardTitle>
@@ -72,44 +72,46 @@ export const PurchaseOrderDetailModal = ({ order, isOpen, onOpenChange }: Purcha
                 </CardContent>
               </Card>
 
-              <Card className="md:col-span-3">
+              <Card className="md:col-span-3 lg:col-span-3">
                 <CardHeader>
                   <CardTitle className="text-base">Itens do Pedido</CardTitle>
                 </CardHeader>
-                <CardContent className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Produto</TableHead>
-                        <TableHead className="text-center">Qtd.</TableHead>
-                        <TableHead className="text-right">Custo Unit.</TableHead>
-                        <TableHead className="text-right">Subtotal</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {order.items.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="text-sm">{item.productName}</TableCell>
-                          <TableCell className="text-center text-sm">{item.quantity}</TableCell>
-                          <TableCell className="text-right text-sm">{item.unitPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
-                          <TableCell className="text-right text-sm">{(item.quantity * item.unitPrice).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table className="min-w-[600px]">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Produto</TableHead>
+                          <TableHead className="text-center">Qtd.</TableHead>
+                          <TableHead className="text-right">Custo Unit.</TableHead>
+                          <TableHead className="text-right">Subtotal</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {order.items.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell className="text-sm">{item.productName}</TableCell>
+                            <TableCell className="text-center text-sm">{item.quantity}</TableCell>
+                            <TableCell className="text-right text-sm">{item.unitPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
+                            <TableCell className="text-right text-sm">{(item.quantity * item.unitPrice).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="md:col-start-3">
-                  <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Resumo Financeiro</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-right">
-                      <p className="text-xl font-bold">
-                          {order.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                      </p>
-                      <p className="text-xs text-muted-foreground">Valor Total do Pedido</p>
-                  </CardContent>
+              <Card className="md:col-span-2 lg:col-span-2">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">Resumo Financeiro</CardTitle>
+                </CardHeader>
+                <CardContent className="text-right">
+                  <p className="text-xl font-bold">
+                    {order.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Valor Total do Pedido</p>
+                </CardContent>
               </Card>
             </div>
           </div>
