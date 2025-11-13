@@ -1,10 +1,10 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Eye, Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { SalesOrder } from "@/data/salesOrders";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SalesOrderTableProps {
   orders: SalesOrder[];
@@ -45,21 +45,36 @@ export const SalesOrderTable = ({ orders, onViewDetails, onCancel }: SalesOrderT
                 {order.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </TableCell>
               <TableCell className="block md:table-cell text-right md:text-center p-2 md:p-4">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onViewDetails(order.id)}><Eye className="mr-2 h-4 w-4" /> Detalhes</DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="text-red-500" 
-                      onClick={() => onCancel(order.id)}
-                      disabled={order.status === 'Cancelado'}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" /> Cancelar
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center justify-end md:justify-center gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onViewDetails(order.id)}>
+                        <Eye className="h-4 w-4" />
+                        <span className="sr-only">Ver Detalhes</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Ver Detalhes</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => onCancel(order.id)}
+                        disabled={order.status === 'Cancelado'}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <span className="sr-only">Cancelar Pedido</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Cancelar Pedido</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </TableCell>
             </TableRow>
           ))}
