@@ -43,77 +43,75 @@ export const PurchaseOrderDetailModal = ({ order, isOpen, onOpenChange }: Purcha
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-3xl max-w-[95vw] h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-3xl max-w-[95vw] h-[85vh] md:h-[80vh] overflow-y-auto p-4 md:p-6">
           <DialogHeader>
-            <DialogTitle>Detalhes do Pedido de Compra</DialogTitle>
-            <DialogDescription>Pedido #{order.number}</DialogDescription>
+            <DialogTitle className="text-lg md:text-xl">Detalhes do Pedido de Compra</DialogTitle>
+            <DialogDescription className="text-xs md:text-sm">Pedido #{order.number}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="md:col-span-3 lg:col-span-3">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle className="text-base">Informações Gerais</CardTitle>
-                    <p className="text-sm text-muted-foreground">Fornecedor: {order.supplierName}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Data do Pedido</p>
-                    <p className="text-sm">{new Date(order.date).toLocaleDateString('pt-BR')}</p>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Status:</span>
-                    <Badge className={cn("text-white", statusStyles[order.status])}>{order.status}</Badge>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsStatusModalOpen(true)}>
-                      <Pencil className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+          <div className="grid gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="md:col-span-3 lg:col-span-3 p-3 md:p-4">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 md:pb-4">
+                <div>
+                  <CardTitle className="text-base md:text-lg">Informações Gerais</CardTitle>
+                  <p className="text-xs md:text-sm text-muted-foreground">Fornecedor: {order.supplierName}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs md:text-sm text-muted-foreground">Data do Pedido</p>
+                  <p className="text-xs md:text-sm">{new Date(order.date).toLocaleDateString('pt-BR')}</p>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-2 md:pt-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs md:text-sm font-medium">Status:</span>
+                  <Badge className={cn("text-white text-xs md:text-sm", statusStyles[order.status])}>{order.status}</Badge>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10" onClick={() => setIsStatusModalOpen(true)}>
+                    <Pencil className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="md:col-span-3 lg:col-span-3">
-                <CardHeader>
-                  <CardTitle className="text-base">Itens do Pedido</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <Table className="min-w-[600px]">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Produto</TableHead>
-                          <TableHead className="text-center">Qtd.</TableHead>
-                          <TableHead className="text-right">Custo Unit.</TableHead>
-                          <TableHead className="text-right">Subtotal</TableHead>
+            <Card className="md:col-span-3 lg:col-span-3 p-3 md:p-4">
+              <CardHeader className="pb-2 md:pb-4">
+                <CardTitle className="text-base md:text-lg">Itens do Pedido</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2 md:pt-4">
+                <div className="overflow-x-auto -mx-2 px-2">
+                  <Table className="min-w-[500px] text-sm">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Produto</TableHead>
+                        <TableHead className="text-center">Qtd.</TableHead>
+                        <TableHead className="text-right">Custo Unit.</TableHead>
+                        <TableHead className="text-right">Subtotal</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {order.items.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="text-xs md:text-sm">{item.productName}</TableCell>
+                          <TableCell className="text-center text-xs md:text-sm">{item.quantity}</TableCell>
+                          <TableCell className="text-right text-xs md:text-sm">{item.unitPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
+                          <TableCell className="text-right text-xs md:text-sm">{(item.quantity * item.unitPrice).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {order.items.map((item, index) => (
-                          <TableRow key={index}>
-                            <TableCell className="text-sm">{item.productName}</TableCell>
-                            <TableCell className="text-center text-sm">{item.quantity}</TableCell>
-                            <TableCell className="text-right text-sm">{item.unitPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
-                            <TableCell className="text-right text-sm">{(item.quantity * item.unitPrice).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="md:col-span-2 lg:col-span-2">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Resumo Financeiro</CardTitle>
-                </CardHeader>
-                <CardContent className="text-right">
-                  <p className="text-xl font-bold">
-                    {order.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Valor Total do Pedido</p>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="md:col-span-2 lg:col-span-2 p-3 md:p-4">
+              <CardHeader className="pb-2 md:pb-4">
+                <CardTitle className="text-base md:text-lg">Resumo Financeiro</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2 md:pt-4 text-right">
+                <p className="text-lg md:text-xl font-bold">
+                  {order.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </p>
+                <p className="text-xs md:text-sm text-muted-foreground">Valor Total do Pedido</p>
+              </CardContent>
+            </Card>
           </div>
         </DialogContent>
       </Dialog>
