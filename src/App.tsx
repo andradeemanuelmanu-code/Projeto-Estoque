@@ -22,8 +22,7 @@ import { AppDataProvider } from "./context/AppDataContext";
 import DetalhesPedidoVenda from "./pages/DetalhesPedidoVenda";
 import DetalhesPedidoCompra from "./pages/DetalhesPedidoCompra";
 import HistoricoProduto from "./pages/HistoricoProduto";
-import OtimizacaoRotas from "./pages/OtimizacaoRotas";
-import FalarComDeus from "./pages/FalarComDeus"; // Importando a nova página
+import OtimizacaoRotas from "./pages/OtimizacaoRotas"; // Importando a nova página
 
 const queryClient = new QueryClient();
 
@@ -49,10 +48,9 @@ const App = () => (
               <Route path="/vendas/pedidos/novo" element={<NovoPedidoVenda />} />
               <Route path="/vendas/pedidos/:orderId" element={<DetalhesPedidoVenda />} />
               <Route path="/mapa" element={<Mapa />} />
-              <Route path="/otimizacao-rotas" element={<OtimizacaoRotas />} />
+              <Route path="/otimizacao-rotas" element={<OtimizacaoRotas />} /> {/* Nova rota */}
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/ia-insights" element={<IAInsights />} />
-              <Route path="/falar-com-deus" element={<FalarComDeus />} /> {/* Nova rota */}
               <Route path="/configuracoes" element={<Configuracoes />} />
             </Route>
             <Route path="*" element={<NotFound />} />

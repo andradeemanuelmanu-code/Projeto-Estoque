@@ -1,7 +1,7 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   Menu, Wrench, Bell, CircleUser, LayoutDashboard, Package, ShoppingCart,
-  ClipboardList, Map, BarChart3, Settings, Users, Truck, Sparkles, Route, MessageSquare
+  ClipboardList, Map, BarChart3, Settings, Users, Truck, Sparkles, Route
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,7 +45,6 @@ const navItems = [
   { to: "/otimizacao-rotas", label: "Otimização de Rotas", Icon: Route },
   { to: "/relatorios", label: "Relatórios", Icon: BarChart3 },
   { to: "/ia-insights", label: "IA Insights", Icon: Sparkles },
-  { to: "/falar-com-deus", label: "Falar com Deus", Icon: MessageSquare },
   { to: "/configuracoes", label: "Configurações", Icon: Settings },
 ];
 
