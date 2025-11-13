@@ -1,4 +1,5 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, Phone, Mail } from "lucide-react";
@@ -6,21 +7,29 @@ import { SalesOrderTable } from "@/components/vendas/SalesOrderTable";
 import NotFound from "./NotFound";
 import { useAppData } from "@/context/AppDataContext";
 import { showSuccess } from "@/utils/toast";
+import { SalesOrder } from "@/data/salesOrders";
+import { SalesOrderDetailModal } from "@/components/vendas/SalesOrderDetailModal";
 
 const HistoricoCliente = () => {
   const { customerId } = useParams<{ customerId: string }>();
   const { customers, salesOrders, cancelSalesOrder } = useAppData();
-  const navigate = useNavigate();
   
   const customer = customers.find(c => c.id === customerId);
   const customerOrders = salesOrders.filter(o => o.customerId === customerId);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
 
   if (!customer) {
     return <NotFound />;
   }
 
   const handleViewDetails = (orderId: string) => {
-    navigate(`/vendas/pedidos/${orderId}`);
+    const order = salesOrders.find(o => o.id === orderId);
+    if (order) {
+      setSelectedOrder(order);
+      setIsModalOpen(true);
+    }
   };
 
   const handleCancelOrder = (orderId: string) => {
@@ -60,6 +69,11 @@ const HistoricoCliente = () => {
         orders={customerOrders} 
         onViewDetails={handleViewDetails}
         onCancel={handleCancelOrder}
+      />
+      <SalesOrderDetailModal
+        order={selectedOrder}
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
       />
     </>
   );

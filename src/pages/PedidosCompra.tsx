@@ -1,16 +1,19 @@
 import { useState, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
 import { PurchaseOrderTable } from "@/components/compras/PurchaseOrderTable";
 import { useAppData } from "@/context/AppDataContext";
 import { showSuccess } from "@/utils/toast";
+import { PurchaseOrder } from "@/data/purchaseOrders";
+import { PurchaseOrderDetailModal } from "@/components/compras/PurchaseOrderDetailModal";
 
 const PedidosCompra = () => {
   const { purchaseOrders, cancelPurchaseOrder } = useAppData();
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
 
   const filteredOrders = useMemo(() => {
     if (!searchTerm) return purchaseOrders;
@@ -22,7 +25,11 @@ const PedidosCompra = () => {
   }, [purchaseOrders, searchTerm]);
 
   const handleViewDetails = (orderId: string) => {
-    navigate(`/compras/pedidos/${orderId}`);
+    const order = purchaseOrders.find(o => o.id === orderId);
+    if (order) {
+      setSelectedOrder(order);
+      setIsModalOpen(true);
+    }
   };
 
   const handleCancelOrder = (orderId: string) => {
@@ -59,6 +66,11 @@ const PedidosCompra = () => {
         orders={filteredOrders} 
         onViewDetails={handleViewDetails}
         onCancel={handleCancelOrder}
+      />
+      <PurchaseOrderDetailModal
+        order={selectedOrder}
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
       />
     </>
   );
