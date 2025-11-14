@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Lightbulb, TrendingUp, AlertTriangle, Sparkles, Loader2, RefreshCw } from "lucide-react";
 import { showLoading, dismissToast, showError } from "@/utils/toast";
-import { generateInsight, InsightResult, InsightType } from "../services/iaService";
+import { generateInsight, InsightResult, InsightType, InsightAction } from "../services/iaService";
 
-type InsightState = Omit<InsightResult, 'status'> & {
+type InsightState = Omit<InsightResult, 'status' | 'action'> & {
   status: 'idle' | 'loading' | 'success' | 'no_insight' | 'error';
+  action?: InsightAction;
 };
 
 type InsightsState = Record<InsightType, InsightState>;
@@ -27,7 +28,7 @@ const IAInsights = () => {
 
     try {
       const result = await generateInsight(type);
-      setInsights(prev => ({ ...prev, [type]: result }));
+      setInsights(prev => ({ ...prev, [type]: result as InsightState }));
     } catch (error: any) {
       setInsights(prev => ({ ...prev, [type]: error }));
       showError(error.errorMessage || "Falha ao gerar insight.");
