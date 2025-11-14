@@ -14,6 +14,7 @@ import { Product } from "@/data/products";
 import { showSuccess, showError } from "@/utils/toast";
 import { useAppData } from "@/context/AppDataContext";
 import { ProductHistoryModal } from "@/components/estoque/ProductHistoryModal";
+import { useProductHistory } from "@/hooks/useProductHistory";
 
 const Estoque = () => {
   const { products: globalProducts, salesOrders, purchaseOrders } = useAppData();
@@ -23,8 +24,13 @@ const Estoque = () => {
   const [searchTerm, setSearchTerm] = useState("");
   
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [productMovements, setProductMovements] = useState<any[]>([]);
+  const [historyProductId, setHistoryProductId] = useState<string | null>(null);
+
+  const { product: selectedProduct, movements: productMovements } = useProductHistory(historyProductId, {
+    products: globalProducts,
+    salesOrders,
+    purchaseOrders,
+  });
 
   const categories = useMemo(() => {
     const categorySet = new Set(globalProducts.map(p => p.category));
@@ -86,55 +92,15 @@ const Estoque = () => {
   };
 
   const handleViewHistory = (productId: string) => {
-    const product = globalProducts.find(p => p.id === productId);
-    if (!product) return;
-
-    const purchaseMovements = purchaseOrders
-      .filter(order => order.status === 'Recebido')
-      .flatMap(order =>
-        order.items
-          .filter(item => item.productId === product.id)
-          .map(item => ({
-            date: new Date(order.date),
-            type: 'Entrada' as const,
-            document: order.number,
-            documentId: order.id,
-            documentType: 'purchase' as const,
-            quantity: item.quantity,
-          }))
-      );
-
-    const salesMovements = salesOrders
-      .filter(order => order.status === 'Faturado')
-      .flatMap(order =>
-        order.items
-          .filter(item => item.productId === product.id)
-          .map(item => ({
-            date: new Date(order.date),
-            type: 'Saída' as const,
-            document: order.number,
-            documentId: order.id,
-            documentType: 'sales' as const,
-            quantity: -item.quantity,
-          }))
-      );
-
-    const allMovements = [...purchaseMovements, ...salesMovements].sort(
-      (a, b) => a.date.getTime() - b.date.getTime()
-    );
-
-    const totalMovementQuantity = allMovements.reduce((acc, mov) => acc + mov.quantity, 0);
-    const initialStock = product.stock - totalMovementQuantity;
-
-    let balance = initialStock;
-    const movementsWithBalance = allMovements.map(mov => {
-      balance += mov.quantity;
-      return { ...mov, balance };
-    });
-
-    setSelectedProduct(product);
-    setProductMovements(movementsWithBalance);
+    setHistoryProductId(productId);
     setIsHistoryModalOpen(true);
+  };
+
+  const handleHistoryModalClose = (isOpen: boolean) => {
+    setIsHistoryModalOpen(isOpen);
+    if (!isOpen) {
+      setHistoryProductId(null);
+    }
   };
 
   return (
@@ -183,7 +149,7 @@ const Estoque = () => {
 
       <ProductHistoryModal
         isOpen={isHistoryModalOpen}
-        onOpenChange={setIsHistoryModalOpen}
+        onOpenChange={handleHistoryModalClose}
         product={selectedProduct}
         movements={productMovements}
       />

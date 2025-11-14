@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAppData } from "@/context/AppDataContext";
 import NotFound from "./NotFound";
@@ -6,59 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { ProductHistoryTable } from "@/components/estoque/ProductHistoryTable";
+import { useProductHistory } from "@/hooks/useProductHistory";
 
 const DetalhesProduto = () => {
   const { productId } = useParams<{ productId: string }>();
   const { products, salesOrders, purchaseOrders } = useAppData();
 
-  const product = products.find(p => p.id === productId);
-
-  const movements = useMemo(() => {
-    if (!product) return [];
-
-    const purchaseMovements = purchaseOrders
-      .filter(order => order.status === 'Recebido')
-      .flatMap(order =>
-        order.items
-          .filter(item => item.productId === product.id)
-          .map(item => ({
-            date: new Date(order.date),
-            type: 'Entrada' as const,
-            document: order.number,
-            documentId: order.id,
-            documentType: 'purchase' as const,
-            quantity: item.quantity,
-          }))
-      );
-
-    const salesMovements = salesOrders
-      .filter(order => order.status === 'Faturado')
-      .flatMap(order =>
-        order.items
-          .filter(item => item.productId === product.id)
-          .map(item => ({
-            date: new Date(order.date),
-            type: 'Saída' as const,
-            document: order.number,
-            documentId: order.id,
-            documentType: 'sales' as const,
-            quantity: -item.quantity,
-          }))
-      );
-
-    const allMovements = [...purchaseMovements, ...salesMovements].sort(
-      (a, b) => a.date.getTime() - b.date.getTime()
-    );
-
-    const totalMovementQuantity = allMovements.reduce((acc, mov) => acc + mov.quantity, 0);
-    const initialStock = product.stock - totalMovementQuantity;
-
-    let balance = initialStock;
-    return allMovements.map(mov => {
-      balance += mov.quantity;
-      return { ...mov, balance };
-    });
-  }, [product, salesOrders, purchaseOrders]);
+  const { product, movements } = useProductHistory(productId, {
+    products,
+    salesOrders,
+    purchaseOrders,
+  });
 
   if (!product) {
     return <NotFound />;
