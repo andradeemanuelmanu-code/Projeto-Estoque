@@ -1,18 +1,25 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { SalesOrderTable } from "@/components/vendas/SalesOrderTable";
 import { useAppData } from "@/context/AppDataContext";
 import { showSuccess } from "@/utils/toast";
 import { SalesOrder } from "@/data/salesOrders";
 import { SalesOrderDetailModal } from "@/components/vendas/SalesOrderDetailModal";
+import { SalesOrderForm } from "@/components/vendas/SalesOrderForm";
 
 const PedidosVenda = () => {
-  const { salesOrders, cancelSalesOrder } = useAppData();
+  const { salesOrders, cancelSalesOrder, customers, products, addSalesOrder } = useAppData();
   const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
 
   const filteredOrders = useMemo(() => {
@@ -28,7 +35,7 @@ const PedidosVenda = () => {
     const order = salesOrders.find(o => o.id === orderId);
     if (order) {
       setSelectedOrder(order);
-      setIsModalOpen(true);
+      setIsDetailModalOpen(true);
     }
   };
 
@@ -37,6 +44,31 @@ const PedidosVenda = () => {
       cancelSalesOrder(orderId);
       showSuccess("Pedido cancelado com sucesso!");
     }
+  };
+
+  const handleFormSubmit = (data: any) => {
+    const customer = customers.find(c => c.id === data.customerId);
+    if (!customer) return;
+
+    const totalValue = data.items.reduce((acc: number, item: any) => acc + item.quantity * item.unitPrice, 0);
+
+    const newOrder: Omit<SalesOrder, 'id' | 'number'> = {
+      customerId: customer.id,
+      customerName: customer.name,
+      date: new Date().toISOString().split('T')[0],
+      status: "Pendente",
+      totalValue,
+      items: data.items.map((item: any) => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })),
+    };
+
+    addSalesOrder(newOrder);
+    showSuccess("Pedido de venda criado com sucesso!");
+    setIsFormModalOpen(false);
   };
 
   return (
@@ -54,11 +86,9 @@ const PedidosVenda = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button asChild className="w-full sm:w-auto">
-            <Link to="/vendas/pedidos/novo">
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Novo Pedido
-            </Link>
+          <Button onClick={() => setIsFormModalOpen(true)} className="w-full sm:w-auto">
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Novo Pedido
           </Button>
         </div>
       </div>
@@ -69,9 +99,24 @@ const PedidosVenda = () => {
       />
       <SalesOrderDetailModal
         order={selectedOrder}
-        isOpen={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        isOpen={isDetailModalOpen}
+        onOpenChange={setIsDetailModalOpen}
       />
+      <Dialog open={isFormModalOpen} onOpenChange={setIsFormModalOpen}>
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Novo Pedido de Venda</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto pr-4">
+            <SalesOrderForm
+              customers={customers}
+              products={products}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setIsFormModalOpen(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

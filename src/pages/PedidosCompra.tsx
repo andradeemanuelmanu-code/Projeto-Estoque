@@ -1,18 +1,25 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { PurchaseOrderTable } from "@/components/compras/PurchaseOrderTable";
 import { useAppData } from "@/context/AppDataContext";
 import { showSuccess } from "@/utils/toast";
 import { PurchaseOrder } from "@/data/purchaseOrders";
 import { PurchaseOrderDetailModal } from "@/components/compras/PurchaseOrderDetailModal";
+import { PurchaseOrderForm } from "@/components/compras/PurchaseOrderForm";
 
 const PedidosCompra = () => {
-  const { purchaseOrders, cancelPurchaseOrder } = useAppData();
+  const { purchaseOrders, cancelPurchaseOrder, suppliers, products, addPurchaseOrder } = useAppData();
   const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
 
   const filteredOrders = useMemo(() => {
@@ -28,7 +35,7 @@ const PedidosCompra = () => {
     const order = purchaseOrders.find(o => o.id === orderId);
     if (order) {
       setSelectedOrder(order);
-      setIsModalOpen(true);
+      setIsDetailModalOpen(true);
     }
   };
 
@@ -37,6 +44,31 @@ const PedidosCompra = () => {
       cancelPurchaseOrder(orderId);
       showSuccess("Pedido de compra cancelado com sucesso!");
     }
+  };
+
+  const handleFormSubmit = (data: any) => {
+    const supplier = suppliers.find(s => s.id === data.supplierId);
+    if (!supplier) return;
+
+    const totalValue = data.items.reduce((acc: number, item: any) => acc + item.quantity * item.unitPrice, 0);
+
+    const newOrder: Omit<PurchaseOrder, 'id' | 'number'> = {
+      supplierId: supplier.id,
+      supplierName: supplier.name,
+      date: new Date().toISOString().split('T')[0],
+      status: "Recebido",
+      totalValue,
+      items: data.items.map((item: any) => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })),
+    };
+
+    addPurchaseOrder(newOrder);
+    showSuccess("Pedido de compra criado e estoque atualizado!");
+    setIsFormModalOpen(false);
   };
 
   return (
@@ -54,11 +86,9 @@ const PedidosCompra = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button asChild className="w-full sm:w-auto">
-            <Link to="/compras/pedidos/novo">
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Novo Pedido
-            </Link>
+          <Button onClick={() => setIsFormModalOpen(true)} className="w-full sm:w-auto">
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Novo Pedido
           </Button>
         </div>
       </div>
@@ -69,9 +99,24 @@ const PedidosCompra = () => {
       />
       <PurchaseOrderDetailModal
         order={selectedOrder}
-        isOpen={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        isOpen={isDetailModalOpen}
+        onOpenChange={setIsDetailModalOpen}
       />
+      <Dialog open={isFormModalOpen} onOpenChange={setIsFormModalOpen}>
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Novo Pedido de Compra</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto pr-4">
+            <PurchaseOrderForm
+              suppliers={suppliers}
+              products={products}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setIsFormModalOpen(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

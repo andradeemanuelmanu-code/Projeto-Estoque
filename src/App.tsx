@@ -8,10 +8,8 @@ import NotFound from "./pages/NotFound";
 import Estoque from "./pages/Estoque";
 import Fornecedores from "./pages/Fornecedores";
 import PedidosCompra from "./pages/PedidosCompra";
-import NovoPedidoCompra from "./pages/NovoPedidoCompra";
 import Clientes from "./pages/Clientes";
 import PedidosVenda from "./pages/PedidosVenda";
-import NovoPedidoVenda from "./pages/NovoPedidoVenda";
 import Mapa from "./pages/Mapa";
 import Relatorios from "./pages/Relatorios";
 import IAInsights from "./pages/IAInsights";
@@ -40,12 +38,10 @@ const App = () => (
               <Route path="/estoque/:productId" element={<HistoricoProduto />} />
               <Route path="/compras/fornecedores" element={<Fornecedores />} />
               <Route path="/compras/pedidos" element={<PedidosCompra />} />
-              <Route path="/compras/pedidos/novo" element={<NovoPedidoCompra />} />
               <Route path="/compras/pedidos/:orderId" element={<DetalhesPedidoCompra />} />
               <Route path="/vendas/clientes" element={<Clientes />} />
               <Route path="/vendas/clientes/:customerId" element={<HistoricoCliente />} />
               <Route path="/vendas/pedidos" element={<PedidosVenda />} />
-              <Route path="/vendas/pedidos/novo" element={<NovoPedidoVenda />} />
               <Route path="/vendas/pedidos/:orderId" element={<DetalhesPedidoVenda />} />
               <Route path="/mapa" element={<Mapa />} />
               <Route path="/otimizacao-rotas" element={<OtimizacaoRotas />} /> {/* Nova rota */}
