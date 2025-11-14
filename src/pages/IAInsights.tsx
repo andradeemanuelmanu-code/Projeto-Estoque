@@ -1,73 +1,112 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lightbulb, TrendingUp, AlertTriangle, Sparkles, Loader2 } from "lucide-react";
-import { showLoading, dismissToast } from "@/utils/toast";
+import { Lightbulb, TrendingUp, AlertTriangle, Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { showLoading, dismissToast, showError } from "@/utils/toast";
+import { generateInsight, InsightResult, InsightType } from "../services/iaService";
 
-type InsightType = 'demand' | 'crossSell' | 'supplier';
+type InsightState = Omit<InsightResult, 'status'> & {
+  status: 'idle' | 'loading' | 'success' | 'no_insight' | 'error';
+};
+
+type InsightsState = Record<InsightType, InsightState>;
+
+const initialInsightsState: InsightsState = {
+  demand: { status: 'idle' },
+  crossSell: { status: 'idle' },
+  supplier: { status: 'idle' },
+};
 
 const IAInsights = () => {
-  const [demandInsight, setDemandInsight] = useState<string | null>(null);
-  const [crossSellInsight, setCrossSellInsight] = useState<string | null>(null);
-  const [supplierInsight, setSupplierInsight] = useState<string | null>(null);
-  const [loadingInsight, setLoadingInsight] = useState<InsightType | null>(null);
+  const [insights, setInsights] = useState<InsightsState>(initialInsightsState);
 
-  const handleGenerateInsight = (type: InsightType) => {
-    setLoadingInsight(type);
-    const toastId = showLoading(`Analisando dados e gerando insight...`);
+  const handleGenerateInsight = async (type: InsightType) => {
+    setInsights(prev => ({ ...prev, [type]: { status: 'loading' } }));
+    const toastId = showLoading(`Analisando dados e gerando insight de ${type}...`);
 
-    setTimeout(() => {
+    try {
+      const result = await generateInsight(type);
+      setInsights(prev => ({ ...prev, [type]: result }));
+    } catch (error: any) {
+      setInsights(prev => ({ ...prev, [type]: error }));
+      showError(error.errorMessage || "Falha ao gerar insight.");
+    } finally {
       dismissToast(toastId);
-      setLoadingInsight(null);
-      switch (type) {
-        case 'demand':
-          setDemandInsight(
-            'Com base nas tendências de vendas históricas e sazonalidade, prevemos que a demanda por "Vela de Ignição Laser Iridium" aumentará em 15% no próximo mês.\n\n**Recomendação:** Aumentar o pedido de compra em 20 unidades para evitar ruptura de estoque.'
-          );
-          break;
-        case 'crossSell':
-          setCrossSellInsight(
-            'Clientes que compram "Pastilha de Freio Dianteira" frequentemente também compram "Filtro de Óleo do Motor".\n\n**Recomendação:** Oferecer um desconto de 5% na compra conjunta desses itens.'
-          );
-          break;
-        case 'supplier':
-          setSupplierInsight(
-            'O fornecedor "Fornecedora Minas Parts" está atualmente com status Inativo.\n\n**Recomendação:** Buscar fornecedores alternativos para os produtos que eram fornecidos por eles para garantir a continuidade do estoque.'
-          );
-          break;
-      }
-    }, 2000); // Simula o tempo de processamento da IA
+    }
   };
 
-  const renderInsightContent = (
-    type: InsightType,
-    insight: string | null,
-    description: string,
-    recommendation: string
-  ) => {
-    if (insight) {
-      return (
-        <div className="space-y-2">
-          {insight.split('\n\n').map((paragraph, index) => (
-            <p key={index} className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-          ))}
-        </div>
-      );
-    }
+  const renderInsightContent = (type: InsightType) => {
+    const insight = insights[type];
 
-    return (
-      <div className="flex flex-col items-start gap-4">
-        <p className="text-sm text-muted-foreground">{description}</p>
-        <Button onClick={() => handleGenerateInsight(type)} disabled={!!loadingInsight}>
-          {loadingInsight === type ? (
+    switch (insight.status) {
+      case 'loading':
+        return (
+          <Button disabled>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Sparkles className="mr-2 h-4 w-4" />
-          )}
-          {loadingInsight === type ? 'Gerando...' : 'Gerar Insight'}
-        </Button>
-      </div>
-    );
+            Gerando...
+          </Button>
+        );
+      
+      case 'success':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">{insight.content?.main}</p>
+              <p className="text-sm">
+                <strong>Recomendação:</strong> {insight.content?.recommendation}
+              </p>
+            </div>
+            {insight.action && (
+              <Button asChild variant="outline">
+                <Link to={insight.action.link}>
+                  <insight.action.Icon className="mr-2 h-4 w-4" />
+                  {insight.action.text}
+                </Link>
+              </Button>
+            )}
+          </div>
+        );
+
+      case 'no_insight':
+        return (
+          <div className="flex flex-col items-start gap-4">
+            <p className="text-sm text-muted-foreground">Nenhuma oportunidade clara foi identificada no momento.</p>
+            <Button onClick={() => handleGenerateInsight(type)}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Analisar Novamente
+            </Button>
+          </div>
+        );
+
+      case 'error':
+        return (
+          <div className="flex flex-col items-start gap-4">
+            <p className="text-sm text-destructive">{insight.errorMessage}</p>
+            <Button variant="destructive" onClick={() => handleGenerateInsight(type)}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Tentar Novamente
+            </Button>
+          </div>
+        );
+
+      case 'idle':
+      default:
+        const descriptions: Record<InsightType, string> = {
+          demand: 'A IA analisará seus dados de vendas para prever a demanda futura de produtos-chave, ajudando a evitar falta ou excesso de estoque.',
+          crossSell: 'A IA identificará padrões de compra em seu histórico de vendas para sugerir produtos que são frequentemente comprados juntos.',
+          supplier: 'A IA avaliará os dados dos seus fornecedores, como status e histórico, para identificar riscos potenciais que possam impactar seu estoque.',
+        };
+        return (
+          <div className="flex flex-col items-start gap-4">
+            <p className="text-sm text-muted-foreground">{descriptions[type]}</p>
+            <Button onClick={() => handleGenerateInsight(type)}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Gerar Insight
+            </Button>
+          </div>
+        );
+    }
   };
 
   return (
@@ -88,12 +127,7 @@ const IAInsights = () => {
             <CardDescription>Análise preditiva para otimizar seus níveis de estoque.</CardDescription>
           </CardHeader>
           <CardContent>
-            {renderInsightContent(
-              'demand',
-              demandInsight,
-              'A IA analisará seus dados de vendas para prever a demanda futura de produtos-chave, ajudando a evitar falta ou excesso de estoque.',
-              ''
-            )}
+            {renderInsightContent('demand')}
           </CardContent>
         </Card>
 
@@ -106,12 +140,7 @@ const IAInsights = () => {
             <CardDescription>Sugestões inteligentes para aumentar o valor médio dos pedidos.</CardDescription>
           </CardHeader>
           <CardContent>
-            {renderInsightContent(
-              'crossSell',
-              crossSellInsight,
-              'A IA identificará padrões de compra em seu histórico de vendas para sugerir produtos que são frequentemente comprados juntos.',
-              ''
-            )}
+            {renderInsightContent('crossSell')}
           </CardContent>
         </Card>
 
@@ -124,12 +153,7 @@ const IAInsights = () => {
             <CardDescription>Identificação de potenciais gargalos na sua cadeia de suprimentos.</CardDescription>
           </CardHeader>
           <CardContent>
-            {renderInsightContent(
-              'supplier',
-              supplierInsight,
-              'A IA avaliará os dados dos seus fornecedores, como status e histórico, para identificar riscos potenciais que possam impactar seu estoque.',
-              ''
-            )}
+            {renderInsightContent('supplier')}
           </CardContent>
         </Card>
       </div>
