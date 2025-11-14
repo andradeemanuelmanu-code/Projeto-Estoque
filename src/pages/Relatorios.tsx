@@ -14,6 +14,10 @@ import { TotalRevenueCard } from "@/components/relatorios/TotalRevenueCard";
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
 import { DateRange } from "react-day-picker";
 import { subDays } from "date-fns";
+import { StockValueCard } from "@/components/relatorios/StockValueCard";
+import { SalesByCategoryChart } from "@/components/relatorios/SalesByCategoryChart";
+import { IdleStockTable } from "@/components/relatorios/IdleStockTable";
+import { ProfitabilityByProductTable } from "@/components/relatorios/ProfitabilityByProductTable";
 
 const Relatorios = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -84,6 +88,25 @@ const Relatorios = () => {
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mt-4">
         <TotalRevenueCard dateRange={date} />
+        <StockValueCard />
+        <ReportCard
+          title="Análise de Lucratividade por Produto"
+          description="Lucro bruto e margem para cada produto vendido no período."
+        >
+          <ProfitabilityByProductTable dateRange={date} />
+        </ReportCard>
+        <ReportCard
+          title="Produtos sem Giro no Período"
+          description="Itens em estoque que não tiveram vendas no período selecionado."
+        >
+          <IdleStockTable dateRange={date} />
+        </ReportCard>
+        <ReportCard
+          title="Vendas por Categoria"
+          description="Faturamento total agrupado por categoria de produto."
+        >
+          <SalesByCategoryChart dateRange={date} />
+        </ReportCard>
         <ReportCard
           title="Análise de Pareto de Produtos"
           description="Produtos que representam a maior parte do faturamento (Curva ABC)."
