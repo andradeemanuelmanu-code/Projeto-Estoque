@@ -20,6 +20,8 @@ import DetalhesPedidoVenda from "./pages/DetalhesPedidoVenda";
 import DetalhesPedidoCompra from "./pages/DetalhesPedidoCompra";
 import OtimizacaoRotas from "./pages/OtimizacaoRotas";
 import DetalhesProduto from "./pages/DetalhesProduto";
+import Login from "./pages/Login";
+import { SessionProvider } from "./context/SessionContext";
 
 const queryClient = new QueryClient();
 
@@ -28,29 +30,32 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AppDataProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/estoque" element={<Estoque />} />
-              <Route path="/estoque/:productId" element={<DetalhesProduto />} />
-              <Route path="/compras/fornecedores" element={<Fornecedores />} />
-              <Route path="/compras/pedidos" element={<PedidosCompra />} />
-              <Route path="/compras/pedidos/:orderId" element={<DetalhesPedidoCompra />} />
-              <Route path="/vendas/clientes" element={<Clientes />} />
-              <Route path="/vendas/pedidos" element={<PedidosVenda />} />
-              <Route path="/vendas/pedidos/:orderId" element={<DetalhesPedidoVenda />} />
-              <Route path="/mapa" element={<Mapa />} />
-              <Route path="/otimizacao-rotas" element={<OtimizacaoRotas />} />
-              <Route path="/relatorios" element={<Relatorios />} />
-              <Route path="/ia-insights" element={<IAInsights />} />
-              <Route path="/configuracoes" element={<Configuracoes />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AppDataProvider>
+      <SessionProvider>
+        <AppDataProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<Layout />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/estoque" element={<Estoque />} />
+                <Route path="/estoque/:productId" element={<DetalhesProduto />} />
+                <Route path="/compras/fornecedores" element={<Fornecedores />} />
+                <Route path="/compras/pedidos" element={<PedidosCompra />} />
+                <Route path="/compras/pedidos/:orderId" element={<DetalhesPedidoCompra />} />
+                <Route path="/vendas/clientes" element={<Clientes />} />
+                <Route path="/vendas/pedidos" element={<PedidosVenda />} />
+                <Route path="/vendas/pedidos/:orderId" element={<DetalhesPedidoVenda />} />
+                <Route path="/mapa" element={<Mapa />} />
+                <Route path="/otimizacao-rotas" element={<OtimizacaoRotas />} />
+                <Route path="/relatorios" element={<Relatorios />} />
+                <Route path="/ia-insights" element={<IAInsights />} />
+                <Route path="/configuracoes" element={<Configuracoes />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AppDataProvider>
+      </SessionProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
