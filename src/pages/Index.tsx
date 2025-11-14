@@ -20,7 +20,7 @@ import { MarginChartCard } from "@/components/dashboard/MarginChartCard";
 import { OrderStatusChart } from "@/components/dashboard/OrderStatusChart";
 import { StockMovementChart } from "@/components/dashboard/StockMovementChart";
 import { useAppData } from "@/context/AppDataContext";
-import { Product } from "@/data/products";
+import { Product } from "@/types/Product";
 import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
 
 const Index = () => {

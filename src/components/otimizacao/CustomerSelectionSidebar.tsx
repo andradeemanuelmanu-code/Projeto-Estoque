@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Route, Loader2, Milestone, Clock, Ticket } from "lucide-react";
-import { Customer } from "@/data/customers";
+import { Customer } from "@/types/Customer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface CustomerSelectionSidebarProps {
