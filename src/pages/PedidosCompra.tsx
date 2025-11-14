@@ -11,7 +11,7 @@ import {
 import { PurchaseOrderTable } from "@/components/compras/PurchaseOrderTable";
 import { useAppData } from "@/context/AppDataContext";
 import { showSuccess } from "@/utils/toast";
-import { PurchaseOrder } from "@/data/purchaseOrders";
+import { PurchaseOrder } from "@/types/PurchaseOrder";
 import { PurchaseOrderDetailModal } from "@/components/compras/PurchaseOrderDetailModal";
 import { PurchaseOrderForm } from "@/components/compras/PurchaseOrderForm";
 

@@ -1,20 +1,20 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mockCustomers, Customer } from "@/data/customers";
+import { Customer } from "@/types/Customer";
 import { CustomerCard } from "@/components/vendas/CustomerCard";
 import { CustomerForm } from "@/components/vendas/CustomerForm";
 import { showSuccess, showError } from "@/utils/toast";
 import { useAppData } from "@/context/AppDataContext";
 import { CustomerHistoryModal } from "@/components/vendas/CustomerHistoryModal";
-import { SalesOrder } from "@/data/salesOrders";
+import { SalesOrder } from "@/types/SalesOrder";
 
 const Clientes = () => {
-  const { salesOrders } = useAppData();
-  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
+  const { customers: initialCustomers, salesOrders } = useAppData();
+  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,6 +22,10 @@ const Clientes = () => {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerOrders, setCustomerOrders] = useState<SalesOrder[]>([]);
+
+  useEffect(() => {
+    setCustomers(initialCustomers);
+  }, [initialCustomers]);
 
   const filteredCustomers = useMemo(() => {
     if (!searchTerm) return customers;

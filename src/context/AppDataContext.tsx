@@ -1,10 +1,10 @@
 import { createContext, useContext, useState, ReactNode, useMemo, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Product } from '@/data/products';
-import { SalesOrder } from '@/data/salesOrders';
-import { Customer } from '@/data/customers';
-import { Supplier } from '@/data/suppliers';
-import { PurchaseOrder } from '@/data/purchaseOrders';
+import { Product } from '@/types/Product';
+import { SalesOrder } from '@/types/SalesOrder';
+import { Customer } from '@/types/Customer';
+import { Supplier } from '@/types/Supplier';
+import { PurchaseOrder } from '@/types/PurchaseOrder';
 
 export type Notification = {
   id: string;
@@ -67,11 +67,33 @@ export const AppDataProvider = ({ children }: { children: ReactNode }) => {
         if (suppliersError) throw suppliersError;
         if (purchaseOrdersError) throw purchaseOrdersError;
 
-        setProducts(productsData || []);
-        setSalesOrders(salesOrdersData || []);
-        setCustomers(customersData || []);
+        setProducts(productsData?.map((p: any) => ({
+          ...p,
+          minStock: p.min_stock,
+          maxStock: p.max_stock,
+        })) || []);
+        
+        setSalesOrders(salesOrdersData?.map((o: any) => ({
+          ...o,
+          customerId: o.customer_id,
+          customerName: o.customer_name,
+          totalValue: o.total_value,
+        })) || []);
+
+        setCustomers(customersData?.map((c: any) => ({
+          ...c,
+          cpfCnpj: c.cpf_cnpj,
+        })) || []);
+
         setSuppliers(suppliersData || []);
-        setPurchaseOrders(purchaseOrdersData || []);
+
+        setPurchaseOrders(purchaseOrdersData?.map((o: any) => ({
+          ...o,
+          supplierId: o.supplier_id,
+          supplierName: o.supplier_name,
+          totalValue: o.total_value,
+        })) || []);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

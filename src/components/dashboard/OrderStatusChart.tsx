@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { SalesOrder } from '@/data/salesOrders';
+import { SalesOrder } from '@/types/SalesOrder';
 
 const COLORS = {
   Faturado: '#22c55e', // green

@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, PlusCircle } from "lucide-react";
-import { Supplier } from "@/data/suppliers";
-import { Product } from "@/data/products";
+import { Supplier } from "@/types/Supplier";
+import { Product } from "@/types/Product";
 import { showError } from "@/utils/toast";
 
 const orderItemSchema = z.object({

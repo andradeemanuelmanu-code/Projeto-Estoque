@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Product } from "@/data/products";
+import { Product } from "@/types/Product";
 import { showSuccess, showError } from "@/utils/toast";
 import { useAppData } from "@/context/AppDataContext";
 import { ProductHistoryModal } from "@/components/estoque/ProductHistoryModal";
@@ -25,6 +25,10 @@ const Estoque = () => {
   
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [historyProductId, setHistoryProductId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setProducts(globalProducts);
+  }, [globalProducts]);
 
   const { product: selectedProduct, movements: productMovements } = useProductHistory(historyProductId, {
     products: globalProducts,

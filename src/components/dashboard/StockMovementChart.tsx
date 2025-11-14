@@ -1,7 +1,7 @@
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
 import { useMemo } from 'react';
-import { SalesOrder } from '@/data/salesOrders';
-import { PurchaseOrder } from '@/data/purchaseOrders';
+import { SalesOrder } from '@/types/SalesOrder';
+import { PurchaseOrder } from '@/types/PurchaseOrder';
 
 interface StockMovementChartProps {
   pdfMode?: boolean;

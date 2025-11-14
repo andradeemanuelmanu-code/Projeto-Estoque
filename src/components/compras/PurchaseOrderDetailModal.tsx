@@ -14,7 +14,7 @@ import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OrderStatusDialog } from "@/components/OrderStatusDialog";
 import { showSuccess } from "@/utils/toast";
-import { PurchaseOrder } from "@/data/purchaseOrders";
+import { PurchaseOrder } from "@/types/PurchaseOrder";
 import { useAppData } from "@/context/AppDataContext";
 
 interface PurchaseOrderDetailModalProps {

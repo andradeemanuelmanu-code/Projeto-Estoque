@@ -4,7 +4,7 @@ import { useAppData } from "@/context/AppDataContext";
 import { CustomerSelectionSidebar } from "@/components/otimizacao/CustomerSelectionSidebar";
 import { RouteMap } from "@/components/otimizacao/RouteMap";
 import { showError, showLoading, dismissToast, showSuccess } from "@/utils/toast";
-import { Customer } from "@/data/customers";
+import { Customer } from "@/types/Customer";
 
 type Coordinates = { lat: number; lng: number };
 type OrderedCustomer = Customer & { sequence: number };

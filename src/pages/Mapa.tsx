@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { mockCustomers } from "@/data/customers";
-import { mockSuppliers } from "@/data/suppliers";
 import { MapComponent } from "@/components/mapa/MapComponent";
 import { MapSidebar } from "@/components/mapa/MapSidebar";
+import { useAppData } from "@/context/AppDataContext";
 
 const Mapa = () => {
+  const { customers: allCustomers, suppliers: allSuppliers } = useAppData();
   const [showCustomers, setShowCustomers] = useState(true);
   const [showSuppliers, setShowSuppliers] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,15 +13,15 @@ const Mapa = () => {
   const [searchParams] = useSearchParams();
 
   const locations = useMemo(() => {
-    const customers = showCustomers ? mockCustomers.map(c => ({ ...c, type: 'customer' })) : [];
-    const suppliers = showSuppliers ? mockSuppliers.map(s => ({ ...s, type: 'supplier' })) : [];
+    const customers = showCustomers ? allCustomers.map(c => ({ ...c, type: 'customer' })) : [];
+    const suppliers = showSuppliers ? allSuppliers.map(s => ({ ...s, type: 'supplier' })) : [];
     
     const allLocations = [...customers, ...suppliers];
 
     return allLocations.filter(location => 
       location.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [showCustomers, showSuppliers, searchTerm]);
+  }, [showCustomers, showSuppliers, searchTerm, allCustomers, allSuppliers]);
 
   useEffect(() => {
     const selectedId = searchParams.get('selectedId');

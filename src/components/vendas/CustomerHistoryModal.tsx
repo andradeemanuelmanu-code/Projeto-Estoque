@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MapPin, Phone, Mail } from "lucide-react";
-import { Customer } from "@/data/customers";
-import { SalesOrder } from "@/data/salesOrders";
+import { Customer } from "@/types/Customer";
+import { SalesOrder } from "@/types/SalesOrder";
 import { SalesOrderTable } from "./SalesOrderTable";
 import { SalesOrderDetailModal } from "./SalesOrderDetailModal";
 import { useAppData } from "@/context/AppDataContext";

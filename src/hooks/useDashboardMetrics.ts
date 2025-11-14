@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, subYears } from 'date-fns';
-import { SalesOrder } from '@/data/salesOrders';
-import { PurchaseOrder } from '@/data/purchaseOrders';
+import { SalesOrder } from '@/types/SalesOrder';
+import { PurchaseOrder } from '@/types/PurchaseOrder';
 import { DollarSign, Activity } from 'lucide-react';
 
 const calculatePercentageChange = (current: number, previous: number) => {

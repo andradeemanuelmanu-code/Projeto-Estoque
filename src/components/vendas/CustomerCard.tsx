@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MapPin, Phone, Mail, MoreVertical, Pencil, Trash2, History } from "lucide-react";
-import { Customer } from "@/data/customers";
+import { Customer } from "@/types/Customer";
 
 interface CustomerCardProps {
   customer: Customer;

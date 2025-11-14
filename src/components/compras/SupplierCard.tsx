@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MapPin, Phone, Mail, MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { Supplier } from "@/data/suppliers";
+import { Supplier } from "@/types/Supplier";
 import { cn } from "@/lib/utils";
 
 interface SupplierCardProps {

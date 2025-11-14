@@ -12,7 +12,7 @@ import {
 import { SalesOrderTable } from "@/components/vendas/SalesOrderTable";
 import { useAppData } from "@/context/AppDataContext";
 import { showSuccess } from "@/utils/toast";
-import { SalesOrder } from "@/data/salesOrders";
+import { SalesOrder } from "@/types/SalesOrder";
 import { SalesOrderDetailModal } from "@/components/vendas/SalesOrderDetailModal";
 import { SalesOrderForm } from "@/components/vendas/SalesOrderForm";
 

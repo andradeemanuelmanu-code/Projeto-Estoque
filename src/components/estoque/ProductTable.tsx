@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, History } from "lucide-react";
-import { Product } from "@/data/products";
+import { Product } from "@/types/Product";
 import {
   Tooltip,
   TooltipContent,

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { Product } from '@/data/products';
-import { SalesOrder } from '@/data/salesOrders';
-import { PurchaseOrder } from '@/data/purchaseOrders';
+import { Product } from '@/types/Product';
+import { SalesOrder } from '@/types/SalesOrder';
+import { PurchaseOrder } from '@/types/PurchaseOrder';
 
 interface UseProductHistoryProps {
   products: Product[];

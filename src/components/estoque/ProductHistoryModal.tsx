@@ -6,7 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Product } from "@/data/products";
+import { Product } from "@/types/Product";
 import { ProductHistoryTable } from "./ProductHistoryTable";
 
 type Movement = {

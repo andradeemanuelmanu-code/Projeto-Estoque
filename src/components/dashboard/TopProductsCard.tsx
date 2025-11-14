@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
-import { SalesOrder } from "@/data/salesOrders";
+import { SalesOrder } from "@/types/SalesOrder";
 
 interface TopProductsCardProps {
   linkTo?: string;

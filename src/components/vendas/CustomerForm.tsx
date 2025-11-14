@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Customer } from "@/data/customers";
+import { Customer } from "@/types/Customer";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório."),

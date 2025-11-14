@@ -1,10 +1,11 @@
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { mockSalesOrders } from '@/data/salesOrders';
+import { useAppData } from '@/context/AppDataContext';
 import { useMemo } from 'react';
 
 export const SalesOverTimeChart = () => {
+  const { salesOrders } = useAppData();
   const chartData = useMemo(() => {
-    const faturadoOrders = mockSalesOrders.filter(order => order.status === 'Faturado');
+    const faturadoOrders = salesOrders.filter(order => order.status === 'Faturado');
     return faturadoOrders.map(order => ({
       date: new Date(order.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
       Faturamento: order.totalValue,
@@ -13,7 +14,7 @@ export const SalesOverTimeChart = () => {
         const dateB = new Date(b.date.split('/').reverse().join('-')).getTime();
         return dateA - dateB;
     });
-  }, []);
+  }, [salesOrders]);
 
   return (
     <div className="h-[350px]">

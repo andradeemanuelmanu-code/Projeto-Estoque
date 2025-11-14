@@ -1,19 +1,25 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mockSuppliers, Supplier } from "@/data/suppliers";
+import { Supplier } from "@/types/Supplier";
 import { SupplierCard } from "@/components/compras/SupplierCard";
 import { SupplierForm } from "@/components/compras/SupplierForm";
 import { showSuccess, showError } from "@/utils/toast";
+import { useAppData } from "@/context/AppDataContext";
 
 const Fornecedores = () => {
-  const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
+  const { suppliers: initialSuppliers } = useAppData();
+  const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    setSuppliers(initialSuppliers);
+  }, [initialSuppliers]);
 
   const filteredSuppliers = useMemo(() => {
     if (!searchTerm) return suppliers;

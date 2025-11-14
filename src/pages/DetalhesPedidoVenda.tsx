@@ -10,7 +10,7 @@ import { ArrowLeft, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { OrderStatusDialog } from "@/components/OrderStatusDialog";
 import { showSuccess } from "@/utils/toast";
-import { SalesOrder } from "@/data/salesOrders";
+import { SalesOrder } from "@/types/SalesOrder";
 
 const statusStyles = {
   Pendente: "bg-orange-500",
