@@ -39,12 +39,12 @@ export const ResponsiveDialog = ({
   if (isMobile) {
     return (
       <Drawer open={isOpen} onOpenChange={onOpenChange}>
-        <DrawerContent>
+        <DrawerContent className="max-h-[90vh]">
           <DrawerHeader className="text-left">
             <DrawerTitle>{title}</DrawerTitle>
             {description && <DrawerDescription>{description}</DrawerDescription>}
           </DrawerHeader>
-          <ScrollArea className="overflow-y-auto">
+          <ScrollArea className="flex-1 overflow-y-auto">
             <div className="p-4 pt-0">{children}</div>
           </ScrollArea>
         </DrawerContent>
@@ -54,13 +54,15 @@ export const ResponsiveDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={cn("max-h-[90vh]", className)}>
+      <DialogContent className={cn("max-h-[90vh] flex flex-col", className)}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <ScrollArea className="pr-6">
-            <div className="pr-1">{children}</div>
+        <ScrollArea className="flex-1 -mr-6 pr-1">
+          <div className="pr-5">
+            {children}
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
