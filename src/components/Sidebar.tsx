@@ -67,7 +67,7 @@ export const Sidebar = () => {
           </nav>
           {footerNavItem && footerNavItem.to && (
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <NavItem key={footerNavItem.label} {...footerNavItem} />
+              <NavItem key={footerNavItem.label} to={footerNavItem.to} label={footerNavItem.label} Icon={footerNavItem.Icon} />
             </nav>
           )}
         </div>
