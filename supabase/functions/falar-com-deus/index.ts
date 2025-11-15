@@ -77,17 +77,24 @@ serve(async (req) => {
     const sqlResult = await sqlResponse.json();
     let generatedSql = sqlResult.choices[0]?.message?.content?.trim();
 
-    // Limpa a resposta da IA para extrair apenas o SQL
+    // Lógica de limpeza de SQL mais robusta
     if (generatedSql) {
-      generatedSql = generatedSql.replace(/```sql\n|```/g, '').trim();
-      const selectIndex = generatedSql.toLowerCase().indexOf('select');
-      if (selectIndex !== -1) {
-        generatedSql = generatedSql.substring(selectIndex);
-      }
-      // Remove o ponto-e-vírgula final, se existir
-      if (generatedSql.endsWith(';')) {
-        generatedSql = generatedSql.slice(0, -1);
-      }
+        // Tenta encontrar um bloco de código SQL formatado em markdown
+        const sqlBlockMatch = generatedSql.match(/```sql\n([\s\S]*?)\n```/);
+        if (sqlBlockMatch && sqlBlockMatch[1]) {
+            generatedSql = sqlBlockMatch[1].trim();
+        } else {
+            // Se não houver bloco de código, procura pela primeira ocorrência de SELECT (case-insensitive)
+            const selectIndex = generatedSql.toLowerCase().indexOf('select');
+            if (selectIndex !== -1) {
+                generatedSql = generatedSql.substring(selectIndex);
+            }
+        }
+
+        // Remove o ponto-e-vírgula final, se existir, para evitar erros de sintaxe na função RPC
+        if (generatedSql.endsWith(';')) {
+            generatedSql = generatedSql.slice(0, -1);
+        }
     }
 
     if (!generatedSql || generatedSql.includes('Não consigo responder') || !generatedSql.toLowerCase().startsWith('select')) {
