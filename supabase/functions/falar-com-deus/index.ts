@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-// CORREÇÃO: Revertendo para o nome de modelo padrão 'gemini-pro' compatível com a API v1beta.
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+// CORREÇÃO FINAL: Usando a API v1 com o modelo mais recente 'gemini-1.5-pro-latest'.
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-latest:generateContent?key=${GEMINI_API_KEY}`;
 
 const SCHEMA_DESCRIPTION = `
 - products: id, code, description, category, brand, stock, min_stock, max_stock
