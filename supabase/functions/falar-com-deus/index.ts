@@ -60,6 +60,7 @@ serve(async (req) => {
     const sqlGenBody = {
       model: MODEL_NAME,
       messages: [{ role: "user", content: sqlGenPrompt }],
+      max_tokens: 500, // Limita o tamanho da resposta de SQL
     };
 
     const sqlResponse = await fetch(OPENROUTER_API_URL, {
@@ -88,7 +89,6 @@ serve(async (req) => {
       throw new Error(`Erro ao consultar o banco de dados: ${queryError.message}`);
     }
 
-    // --- Trava de Segurança para o Tamanho dos Dados ---
     let truncatedData = queryData;
     let truncationMessage = "";
     if (Array.isArray(queryData) && queryData.length > 20) {
@@ -108,6 +108,7 @@ serve(async (req) => {
     const summaryBody = {
       model: MODEL_NAME,
       messages: [{ role: "user", content: summaryPrompt }],
+      max_tokens: 1000, // Limita o tamanho da resposta de resumo
     };
 
     const summaryResponse = await fetch(OPENROUTER_API_URL, {
