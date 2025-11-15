@@ -7,10 +7,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// --- Configuração da OpenRouter ---
 const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL_NAME = "z-ai/glm-4.5-air"; // Modelo gratuito especificado pelo usuário
+const MODEL_NAME = "z-ai/glm-4.5-air";
 
 const SCHEMA_DESCRIPTION = `
 - products: id, code, description, category, brand, stock, min_stock, max_stock
@@ -21,24 +20,19 @@ const SCHEMA_DESCRIPTION = `
 `;
 
 serve(async (req) => {
-  console.log("--- [falar-com-deus] Função iniciada (usando OpenRouter) ---");
-
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
     if (!OPENROUTER_API_KEY) {
-      console.error("ERRO: Chave da API da OpenRouter não encontrada.");
       throw new Error("A chave da API da OpenRouter (OPENROUTER_API_KEY) não foi configurada nos secrets do projeto.");
     }
-    console.log("PASSO 1/5: Chave da API da OpenRouter encontrada.");
 
     const { query } = await req.json();
     if (!query) {
       throw new Error("A consulta (query) não foi fornecida.");
     }
-    console.log(`Consulta recebida: "${query}"`);
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -49,6 +43,7 @@ serve(async (req) => {
     const sqlGenPrompt = `
       Sua tarefa é gerar uma consulta SQL em PostgreSQL para responder à pergunta do usuário com base no esquema do banco de dados.
       Gere APENAS a consulta SQL, sem explicações ou formatação.
+      IMPORTANTE: Para evitar resultados muito grandes, sempre adicione um 'LIMIT 20' ao final de suas consultas, a menos que o usuário peça explicitamente por todos os resultados ou uma contagem.
       Se a pergunta não puder ser respondida, retorne: "Não consigo responder a essa pergunta."
       Esquema: ${SCHEMA_DESCRIPTION}
       Pergunta: "${query}"
@@ -67,7 +62,6 @@ serve(async (req) => {
       messages: [{ role: "user", content: sqlGenPrompt }],
     };
 
-    console.log("Enviando requisição para a OpenRouter para gerar SQL...");
     const sqlResponse = await fetch(OPENROUTER_API_URL, {
       method: "POST",
       headers: headers,
@@ -76,13 +70,11 @@ serve(async (req) => {
 
     if (!sqlResponse.ok) {
       const errorBody = await sqlResponse.text();
-      console.error("ERRO na API da OpenRouter (geração de SQL):", errorBody);
       throw new Error(`Erro na API da OpenRouter ao gerar SQL: ${errorBody}`);
     }
     
     const sqlResult = await sqlResponse.json();
     const generatedSql = sqlResult.choices[0]?.message?.content?.trim();
-    console.log("PASSO 2/5: SQL gerado:", generatedSql);
 
     if (!generatedSql || generatedSql.includes('Não consigo responder')) {
       return new Response(JSON.stringify({ reply: "Desculpe, não consegui formular uma resposta para essa pergunta com os dados disponíveis." }), {
@@ -90,18 +82,24 @@ serve(async (req) => {
       });
     }
 
-    console.log("Executando SQL no banco de dados...");
     const { data: queryData, error: queryError } = await supabaseClient.rpc('execute_sql', { sql_query: generatedSql });
 
     if (queryError) {
-      console.error("ERRO ao executar SQL:", queryError);
       throw new Error(`Erro ao consultar o banco de dados: ${queryError.message}`);
     }
-    console.log("PASSO 3/5: Dados recebidos do banco:", JSON.stringify(queryData));
+
+    // --- Trava de Segurança para o Tamanho dos Dados ---
+    let truncatedData = queryData;
+    let truncationMessage = "";
+    if (Array.isArray(queryData) && queryData.length > 20) {
+        truncatedData = queryData.slice(0, 20);
+        truncationMessage = "Nota: Os resultados foram limitados aos primeiros 20 registros. Informe ao usuário que os dados foram resumidos."
+    }
 
     const summaryPrompt = `
       A pergunta do usuário foi: "${query}"
-      Os resultados da consulta no banco de dados foram: ${JSON.stringify(queryData)}
+      Os resultados da consulta no banco de dados foram: ${JSON.stringify(truncatedData)}
+      ${truncationMessage}
       Com base nesses resultados, formule uma resposta amigável e clara em português.
       Não mencione o SQL. Apenas apresente a resposta final.
       Se os resultados estiverem vazios ou nulos, diga que nenhum dado foi encontrado para a pergunta.
@@ -112,7 +110,6 @@ serve(async (req) => {
       messages: [{ role: "user", content: summaryPrompt }],
     };
 
-    console.log("Enviando requisição para a OpenRouter para resumir os dados...");
     const summaryResponse = await fetch(OPENROUTER_API_URL, {
       method: "POST",
       headers: headers,
@@ -121,15 +118,12 @@ serve(async (req) => {
 
     if (!summaryResponse.ok) {
       const errorBody = await summaryResponse.text();
-      console.error("ERRO na API da OpenRouter (resumo de dados):", errorBody);
       throw new Error(`Erro na API da OpenRouter ao resumir dados: ${errorBody}`);
     }
 
     const summaryResult = await summaryResponse.json();
     const finalReply = summaryResult.choices[0]?.message?.content?.trim();
-    console.log("PASSO 4/5: Resposta final gerada:", finalReply);
 
-    console.log("PASSO 5/5: Enviando resposta final para o cliente.");
     return new Response(JSON.stringify({ reply: finalReply || "Não foi possível processar a resposta." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
