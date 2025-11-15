@@ -60,7 +60,7 @@ serve(async (req) => {
     const sqlGenBody = {
       model: MODEL_NAME,
       messages: [{ role: "user", content: sqlGenPrompt }],
-      max_tokens: 500, // Limita o tamanho da resposta de SQL
+      max_tokens: 500,
     };
 
     const sqlResponse = await fetch(OPENROUTER_API_URL, {
@@ -75,10 +75,19 @@ serve(async (req) => {
     }
     
     const sqlResult = await sqlResponse.json();
-    const generatedSql = sqlResult.choices[0]?.message?.content?.trim();
+    let generatedSql = sqlResult.choices[0]?.message?.content?.trim();
 
-    if (!generatedSql || generatedSql.includes('Não consigo responder')) {
-      return new Response(JSON.stringify({ reply: "Desculpe, não consegui formular uma resposta para essa pergunta com os dados disponíveis." }), {
+    // Limpa a resposta da IA para extrair apenas o SQL
+    if (generatedSql) {
+      generatedSql = generatedSql.replace(/```sql\n|```/g, '').trim();
+      const selectIndex = generatedSql.toLowerCase().indexOf('select');
+      if (selectIndex !== -1) {
+        generatedSql = generatedSql.substring(selectIndex);
+      }
+    }
+
+    if (!generatedSql || generatedSql.includes('Não consigo responder') || !generatedSql.toLowerCase().startsWith('select')) {
+      return new Response(JSON.stringify({ reply: "Desculpe, não consegui formular uma consulta válida para essa pergunta." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -108,7 +117,7 @@ serve(async (req) => {
     const summaryBody = {
       model: MODEL_NAME,
       messages: [{ role: "user", content: summaryPrompt }],
-      max_tokens: 1000, // Limita o tamanho da resposta de resumo
+      max_tokens: 1000,
     };
 
     const summaryResponse = await fetch(OPENROUTER_API_URL, {
