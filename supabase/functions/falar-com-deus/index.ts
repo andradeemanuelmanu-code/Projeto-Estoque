@@ -84,6 +84,10 @@ serve(async (req) => {
       if (selectIndex !== -1) {
         generatedSql = generatedSql.substring(selectIndex);
       }
+      // Remove o ponto-e-vírgula final, se existir
+      if (generatedSql.endsWith(';')) {
+        generatedSql = generatedSql.slice(0, -1);
+      }
     }
 
     if (!generatedSql || generatedSql.includes('Não consigo responder') || !generatedSql.toLowerCase().startsWith('select')) {
