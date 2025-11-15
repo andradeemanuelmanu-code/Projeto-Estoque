@@ -7,9 +7,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-// CORREÇÃO DEFINITIVA: Usando o modelo 'gemini-pro' com a API v1 para garantir compatibilidade.
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+// --- Configuração da OpenRouter ---
+const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const MODEL_NAME = "z-ai/glm-4.5-air"; // Modelo gratuito especificado pelo usuário
 
 const SCHEMA_DESCRIPTION = `
 - products: id, code, description, category, brand, stock, min_stock, max_stock
@@ -20,23 +21,21 @@ const SCHEMA_DESCRIPTION = `
 `;
 
 serve(async (req) => {
-  console.log("--- [falar-com-deus] Função iniciada ---");
+  console.log("--- [falar-com-deus] Função iniciada (usando OpenRouter) ---");
 
   if (req.method === "OPTIONS") {
-    console.log("Recebida requisição OPTIONS. Respondendo com OK.");
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    if (!GEMINI_API_KEY) {
-      console.error("ERRO: Chave da API do Gemini não encontrada.");
-      throw new Error("A chave da API do Gemini (GEMINI_API_KEY) não foi configurada nos secrets do projeto.");
+    if (!OPENROUTER_API_KEY) {
+      console.error("ERRO: Chave da API da OpenRouter não encontrada.");
+      throw new Error("A chave da API da OpenRouter (OPENROUTER_API_KEY) não foi configurada nos secrets do projeto.");
     }
-    console.log("PASSO 1/5: Chave da API do Gemini encontrada.");
+    console.log("PASSO 1/5: Chave da API da OpenRouter encontrada.");
 
     const { query } = await req.json();
     if (!query) {
-      console.error("ERRO: A consulta (query) não foi fornecida no corpo da requisição.");
       throw new Error("A consulta (query) não foi fornecida.");
     }
     console.log(`Consulta recebida: "${query}"`);
@@ -56,26 +55,36 @@ serve(async (req) => {
       SQL:
     `;
 
-    const geminiSqlRequest = { contents: [{ parts: [{ text: sqlGenPrompt }] }] };
-    console.log("Enviando requisição para o Gemini para gerar SQL...");
-    const sqlResponse = await fetch(GEMINI_API_URL, {
+    const headers = {
+      "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": `https://${Deno.env.get("SUPABASE_PROJECT_ID")}.supabase.co`,
+      "X-Title": "Autoparts ERP",
+    };
+
+    const sqlGenBody = {
+      model: MODEL_NAME,
+      messages: [{ role: "user", content: sqlGenPrompt }],
+    };
+
+    console.log("Enviando requisição para a OpenRouter para gerar SQL...");
+    const sqlResponse = await fetch(OPENROUTER_API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(geminiSqlRequest),
+      headers: headers,
+      body: JSON.stringify(sqlGenBody),
     });
 
     if (!sqlResponse.ok) {
       const errorBody = await sqlResponse.text();
-      console.error("ERRO na API do Gemini (geração de SQL):", errorBody);
-      throw new Error(`Erro na API do Gemini ao gerar SQL: ${errorBody}`);
+      console.error("ERRO na API da OpenRouter (geração de SQL):", errorBody);
+      throw new Error(`Erro na API da OpenRouter ao gerar SQL: ${errorBody}`);
     }
     
     const sqlResult = await sqlResponse.json();
-    const generatedSql = sqlResult.candidates[0]?.content?.parts[0]?.text?.trim();
-    console.log("PASSO 2/5: SQL gerado pelo Gemini:", generatedSql);
+    const generatedSql = sqlResult.choices[0]?.message?.content?.trim();
+    console.log("PASSO 2/5: SQL gerado:", generatedSql);
 
     if (!generatedSql || generatedSql.includes('Não consigo responder')) {
-      console.log("Gemini não conseguiu gerar um SQL válido. Retornando resposta padrão.");
       return new Response(JSON.stringify({ reply: "Desculpe, não consegui formular uma resposta para essa pergunta com os dados disponíveis." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -85,7 +94,7 @@ serve(async (req) => {
     const { data: queryData, error: queryError } = await supabaseClient.rpc('execute_sql', { sql_query: generatedSql });
 
     if (queryError) {
-      console.error("ERRO ao executar SQL no banco de dados:", queryError);
+      console.error("ERRO ao executar SQL:", queryError);
       throw new Error(`Erro ao consultar o banco de dados: ${queryError.message}`);
     }
     console.log("PASSO 3/5: Dados recebidos do banco:", JSON.stringify(queryData));
@@ -98,23 +107,27 @@ serve(async (req) => {
       Se os resultados estiverem vazios ou nulos, diga que nenhum dado foi encontrado para a pergunta.
     `;
 
-    const geminiSummaryRequest = { contents: [{ parts: [{ text: summaryPrompt }] }] };
-    console.log("Enviando requisição para o Gemini para resumir os dados...");
-    const summaryResponse = await fetch(GEMINI_API_URL, {
+    const summaryBody = {
+      model: MODEL_NAME,
+      messages: [{ role: "user", content: summaryPrompt }],
+    };
+
+    console.log("Enviando requisição para a OpenRouter para resumir os dados...");
+    const summaryResponse = await fetch(OPENROUTER_API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(geminiSummaryRequest),
+      headers: headers,
+      body: JSON.stringify(summaryBody),
     });
 
     if (!summaryResponse.ok) {
       const errorBody = await summaryResponse.text();
-      console.error("ERRO na API do Gemini (resumo de dados):", errorBody);
-      throw new Error(`Erro na API do Gemini ao resumir dados: ${errorBody}`);
+      console.error("ERRO na API da OpenRouter (resumo de dados):", errorBody);
+      throw new Error(`Erro na API da OpenRouter ao resumir dados: ${errorBody}`);
     }
 
     const summaryResult = await summaryResponse.json();
-    const finalReply = summaryResult.candidates[0]?.content?.parts[0]?.text?.trim();
-    console.log("PASSO 4/5: Resposta final gerada pelo Gemini:", finalReply);
+    const finalReply = summaryResult.choices[0]?.message?.content?.trim();
+    console.log("PASSO 4/5: Resposta final gerada:", finalReply);
 
     console.log("PASSO 5/5: Enviando resposta final para o cliente.");
     return new Response(JSON.stringify({ reply: finalReply || "Não foi possível processar a resposta." }), {
