@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-// SOLUÇÃO FINAL: Usar a API v1beta com o modelo gemini-pro, que é compatível com API Keys.
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+// ATUALIZAÇÃO: Usando o modelo Gemini 1.5 Pro para maior capacidade.
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${GEMINI_API_KEY}`;
 
 const SCHEMA_DESCRIPTION = `
 - products: id, code, description, category, brand, stock, min_stock, max_stock
