@@ -17,7 +17,7 @@ const FalarComDeus = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Olá! Sou seu assistente de IA. Pergunte-me qualquer coisa sobre seus dados de produtos, vendas, clientes ou fornecedores.',
+      content: 'Olá! Sou seu assistente de IA. Posso responder perguntas como "Qual foi nosso faturamento este mês?" ou "Quais produtos estão com estoque baixo?". Como posso ajudar?',
     },
   ]);
   const [input, setInput] = useState('');
@@ -38,13 +38,15 @@ const FalarComDeus = () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setIsLoading(true);
 
     try {
       const { data, error } = await supabase.functions.invoke('falar-com-deus', {
-        body: { query: input },
+        // Envia o histórico completo da conversa
+        body: { messages: newMessages.filter(m => m.role !== 'assistant' || m.content.startsWith('Olá!')) },
       });
 
       if (error) {
