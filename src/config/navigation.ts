@@ -10,6 +10,7 @@ import {
   Truck,
   Sparkles,
   Route,
+  Bot,
 } from "lucide-react";
 
 export type NavItemType = {
@@ -49,5 +50,6 @@ export const navigationConfig: NavItemType[] = [
   { to: "/otimizacao-rotas", label: "Otimização de Rotas", Icon: Route, type: 'main' },
   { to: "/relatorios", label: "Relatórios", Icon: BarChart3, type: 'main' },
   { to: "/ia-insights", label: "IA Insights", Icon: Sparkles, type: 'main' },
+  { to: "/falar-com-deus", label: "Falar com Deus", Icon: Bot, type: 'main' },
   { to: "/configuracoes", label: "Configurações", Icon: Settings, type: 'footer' },
 ];
