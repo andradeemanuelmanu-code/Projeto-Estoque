@@ -21,7 +21,6 @@ import DetalhesPedidoCompra from "./pages/DetalhesPedidoCompra";
 import OtimizacaoRotas from "./pages/OtimizacaoRotas";
 import DetalhesProduto from "./pages/DetalhesProduto";
 import Login from "./pages/Login";
-import FalarComDeus from "./pages/FalarComDeus";
 import { SessionProvider } from "./context/SessionContext";
 
 const queryClient = new QueryClient();
@@ -51,7 +50,6 @@ const App = () => (
                 <Route path="/relatorios" element={<Relatorios />} />
                 <Route path="/ia-insights" element={<IAInsights />} />
                 <Route path="/configuracoes" element={<Configuracoes />} />
-                <Route path="/falar-com-deus" element={<FalarComDeus />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
