@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,58 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
-import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
-import { useSession } from "@/context/SessionContext";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { showSuccess } from "@/utils/toast";
 
 const Configuracoes = () => {
   const { setTheme, theme } = useTheme();
-  const { session, profile, refetchProfile } = useSession();
-
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  
+  const [companyName, setCompanyName] = useState("Autoparts LTDA");
+  const [cnpj, setCnpj] = useState("00.000.000/0001-00");
 
   const [newOrderNotifications, setNewOrderNotifications] = useState(true);
+
   const [lowStockAlerts, setLowStockAlerts] = useState(() => {
     const saved = localStorage.getItem('user_settings_enableStockAlerts');
-    return saved !== 'false';
+    return saved !== 'false'; // Default to true if not set or is 'true'
   });
 
-  useEffect(() => {
-    if (profile) {
-      setFirstName(profile.first_name || '');
-      setLastName(profile.last_name || '');
-    }
-  }, [profile]);
-
-  const handleProfileSave = async () => {
-    if (!session?.user) {
-      showError("Você não está autenticado.");
-      return;
-    }
-
-    setIsSaving(true);
-    const toastId = showLoading("Salvando perfil...");
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        first_name: firstName,
-        last_name: lastName,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', session.user.id);
-
-    dismissToast(toastId);
-    if (error) {
-      showError("Erro ao atualizar o perfil: " + error.message);
-    } else {
-      showSuccess("Perfil atualizado com sucesso!");
-      await refetchProfile();
-    }
-    setIsSaving(false);
+  const handleProfileSave = () => {
+    showSuccess("Perfil da empresa atualizado com sucesso!");
   };
 
   const handleLowStockChange = (checked: boolean) => {
@@ -79,33 +44,28 @@ const Configuracoes = () => {
       <div className="grid gap-6 mt-4">
         <Card>
           <CardHeader>
-            <CardTitle>Meu Perfil</CardTitle>
-            <CardDescription>Atualize suas informações pessoais.</CardDescription>
+            <CardTitle>Perfil da Empresa</CardTitle>
+            <CardDescription>Atualize as informações da sua empresa.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first-name">Nome</Label>
-                <Input 
-                  id="first-name" 
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)} 
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="last-name">Sobrenome</Label>
-                <Input 
-                  id="last-name" 
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="company-name">Nome da Empresa</Label>
+              <Input 
+                id="company-name" 
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)} 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cnpj">CNPJ</Label>
+              <Input 
+                id="cnpj" 
+                value={cnpj}
+                onChange={(e) => setCnpj(e.target.value)}
+              />
             </div>
             <div className="flex justify-end">
-              <Button onClick={handleProfileSave} disabled={isSaving}>
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Salvar Alterações
-              </Button>
+              <Button onClick={handleProfileSave}>Salvar Alterações</Button>
             </div>
           </CardContent>
         </Card>

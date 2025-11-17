@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, Wrench, Bell, CircleUser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAppData } from "@/context/AppDataContext";
-import { useSession } from "@/context/SessionContext";
-import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { navigationConfig } from "@/config/navigation";
 
@@ -39,27 +36,8 @@ const MobileNavLink = ({ to, children }: { to: string, children: React.ReactNode
 
 export const Header = () => {
   const { notifications, markNotificationsAsRead, markSingleNotificationAsRead } = useAppData();
-  const { profile } = useSession();
-  const navigate = useNavigate();
   const hasUnreadNotifications = notifications.some(n => !n.read);
   const location = useLocation();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/login');
-  };
-
-  const getUserInitials = () => {
-    if (!profile) return "?";
-    const { first_name, last_name } = profile;
-    if (first_name && last_name) {
-      return `${first_name.charAt(0)}${last_name.charAt(0)}`;
-    }
-    if (first_name) {
-      return first_name.charAt(0);
-    }
-    return "P";
-  };
 
   return (
     <header className="flex h-16 items-center gap-4 border-b bg-card px-4 lg:px-6">
@@ -160,27 +138,19 @@ export const Header = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            {profile ? (
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>{getUserInitials()}</AvatarFallback>
-              </Avatar>
-            ) : (
-              <CircleUser className="h-5 w-5" />
-            )}
+            <CircleUser className="h-5 w-5" />
             <span className="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>
-            {profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Minha Conta'}
-          </DropdownMenuLabel>
+          <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem>
             <Link to="/configuracoes">Configurações</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>Suporte</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>Sair</DropdownMenuItem>
+          <DropdownMenuItem>Sair</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
