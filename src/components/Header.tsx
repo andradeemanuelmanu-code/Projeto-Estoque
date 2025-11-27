@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, Wrench, Bell, CircleUser } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,9 +21,10 @@ import { useAppData } from "@/context/AppDataContext";
 import { cn } from "@/lib/utils";
 import { navigationConfig } from "@/config/navigation";
 
-const MobileNavLink = ({ to, children }: { to: string, children: React.ReactNode }) => (
+const MobileNavLink = ({ to, children, onClick }: { to: string, children: React.ReactNode, onClick: () => void }) => (
   <NavLink
     to={to}
+    onClick={onClick}
     className={({ isActive }) =>
       cn(
         "flex items-center gap-4 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary",
@@ -35,13 +37,18 @@ const MobileNavLink = ({ to, children }: { to: string, children: React.ReactNode
 );
 
 export const Header = () => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { notifications, markNotificationsAsRead, markSingleNotificationAsRead } = useAppData();
   const hasUnreadNotifications = notifications.some(n => !n.read);
   const location = useLocation();
 
+  const handleLinkClick = () => {
+    setIsSheetOpen(false);
+  };
+
   return (
     <header className="flex h-16 items-center gap-4 border-b bg-card px-4 lg:px-6">
-      <Sheet>
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">
             <Menu className="h-5 w-5" />
@@ -50,7 +57,7 @@ export const Header = () => {
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col bg-card p-0">
           <div className="flex h-16 items-center border-b px-4">
-            <Link to="/" className="flex items-center gap-3 font-semibold">
+            <Link to="/" className="flex items-center gap-3 font-semibold" onClick={handleLinkClick}>
               <Wrench className="h-7 w-7 text-primary" />
               <span className="text-xl">Autoparts</span>
             </Link>
@@ -70,7 +77,7 @@ export const Header = () => {
                       <AccordionContent className="pt-1">
                         <div className="flex flex-col gap-1 pl-8">
                           {item.subItems.map((subItem) => (
-                            <MobileNavLink key={subItem.to} to={subItem.to}>
+                            <MobileNavLink key={subItem.to} to={subItem.to} onClick={handleLinkClick}>
                               <subItem.Icon className="h-5 w-5" />
                               {subItem.label}
                             </MobileNavLink>
@@ -81,7 +88,7 @@ export const Header = () => {
                   </Accordion>
                 ) : (
                   item.to && (
-                    <MobileNavLink key={item.to} to={item.to}>
+                    <MobileNavLink key={item.to} to={item.to} onClick={handleLinkClick}>
                       <item.Icon className="h-5 w-5" />
                       {item.label}
                     </MobileNavLink>
