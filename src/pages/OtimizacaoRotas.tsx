@@ -5,10 +5,6 @@ import { CustomerSelectionSidebar } from "@/components/otimizacao/CustomerSelect
 import { RouteMap } from "@/components/otimizacao/RouteMap";
 import { showError, showLoading, dismissToast, showSuccess } from "@/utils/toast";
 import { Customer } from "@/types/Customer";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { ListOrdered } from "lucide-react";
 
 type Coordinates = { lat: number; lng: number };
 type OrderedCustomer = Customer & { sequence: number };
@@ -28,7 +24,6 @@ const OtimizacaoRotas = () => {
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
   const [tollLocations, setTollLocations] = useState<Coordinates[] | null>(null);
-  const isMobile = useIsMobile();
 
   const handleCustomerToggle = (customerId: string) => {
     setSelectedCustomerIds(prev => {
@@ -146,50 +141,24 @@ const OtimizacaoRotas = () => {
     );
   };
 
-  const sidebarProps = {
-    customers,
-    selectedCustomerIds,
-    onCustomerToggle: handleCustomerToggle,
-    onGenerateRoute: handleGenerateRoute,
-    isGenerating,
-    routeSummary,
-  };
-
-  const mapProps = {
-    orderedCustomers,
-    outboundRoute,
-    returnRoute,
-    userLocation,
-    tollLocations,
-  };
-
-  if (isMobile) {
-    return (
-      <div className="relative h-full w-full">
-        <div className="absolute top-4 left-4 z-[1000]">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button>
-                <ListOrdered className="mr-2 h-4 w-4" /> Selecionar Clientes
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[350px] p-0 flex flex-col">
-              <CustomerSelectionSidebar {...sidebarProps} />
-            </SheetContent>
-          </Sheet>
-        </div>
-        <div className="w-full h-full">
-          <RouteMap {...mapProps} />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[350px_1fr] h-full">
-      <CustomerSelectionSidebar {...sidebarProps} />
+    <div className="grid grid-cols-1 md:grid-cols-[350px_1fr] h-[calc(100vh-60px)]">
+      <CustomerSelectionSidebar
+        customers={customers}
+        selectedCustomerIds={selectedCustomerIds}
+        onCustomerToggle={handleCustomerToggle}
+        onGenerateRoute={handleGenerateRoute}
+        isGenerating={isGenerating}
+        routeSummary={routeSummary}
+      />
       <div className="w-full h-full">
-        <RouteMap {...mapProps} />
+        <RouteMap
+          orderedCustomers={orderedCustomers}
+          outboundRoute={outboundRoute}
+          returnRoute={returnRoute}
+          userLocation={userLocation}
+          tollLocations={tollLocations}
+        />
       </div>
     </div>
   );
