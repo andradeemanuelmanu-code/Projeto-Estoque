@@ -49,6 +49,7 @@ export const CustomerSelectionSidebar = ({
 
   return (
     <div className="flex flex-col bg-card border-r h-full">
+      {/* --- FIXED HEADER --- */}
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold">Otimizador de Rotas</h2>
         <div className="relative mt-4">
@@ -58,13 +59,15 @@ export const CustomerSelectionSidebar = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <div className="pt-4">
+          <p className="text-sm font-medium">Selecione os Clientes</p>
+          <p className="text-xs text-muted-foreground">
+            {selectedCustomerIds.size} cliente(s) selecionado(s).
+          </p>
+        </div>
       </div>
-      <div className="p-4 border-b">
-        <p className="text-sm font-medium">Selecione os Clientes</p>
-        <p className="text-xs text-muted-foreground">
-          {selectedCustomerIds.size} cliente(s) selecionado(s).
-        </p>
-      </div>
+
+      {/* --- SCROLLABLE CONTENT --- */}
       <ScrollArea className="flex-1">
         {filteredCustomers.map(customer => (
           <div
@@ -84,8 +87,9 @@ export const CustomerSelectionSidebar = ({
         ))}
       </ScrollArea>
 
-      {routeSummary && (
-        <div className="p-4 border-t">
+      {/* --- FIXED FOOTER --- */}
+      <div className="p-4 border-t mt-auto space-y-4">
+        {routeSummary && (
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Resumo da Rota</CardTitle>
@@ -114,10 +118,7 @@ export const CustomerSelectionSidebar = ({
               </div>
             </CardContent>
           </Card>
-        </div>
-      )}
-
-      <div className="p-4 border-t">
+        )}
         <Button
           onClick={onGenerateRoute}
           disabled={isGenerating || selectedCustomerIds.size === 0}
